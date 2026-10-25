@@ -15,7 +15,7 @@ public class Ek16Data
     public string? AcademicYear { get; set; }
     public string? StudentEmail { get; set; }
     public string? StudentPhone { get; set; }
-    public int? HealthAidStatus{ get; set; }
+    public int? HealthAidStatus { get; set; }
 
     public string? CompanyName { get; set; }
     public string? ServiceArea { get; set; }
@@ -32,5 +32,14 @@ public class Ek16Data
     public int? InternshipDays { get; set; }
     public bool? WorksOnWeekends { get; set; }
     public bool? IsPaid { get; set; }
+
+    public string? EmployerFullName { get; set; }
+    public string? EmployerTitle { get; set; }
+    public string? EmployerEmail { get; set; }
+    public string? EmployerPhone { get; set; }
+    public bool EmployerHasSignature { get; set; }
+    public bool EmployerHasStamp { get; set; }
+    public bool StudentApprovalFilled { get; set; }
+    public bool AdvisorApprovalFilled { get; set; }
 
 }
