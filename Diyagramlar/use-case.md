@@ -1,6 +1,5 @@
 # Use Case Diyagramı
-
-'''mermaid
+```mermaid
 flowchart LR
     S([Öğrenci])
     A([Admin])
@@ -29,4 +28,4 @@ flowchart LR
     A --> U9
     A --> U11
     U2 -.->|include| U10
-    '''
+    ```

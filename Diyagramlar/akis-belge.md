@@ -1,6 +1,6 @@
 # Belge yükleme ve doğrulama akışı
 
-'''mermaid
+```mermaid
 flowchart TD
     A(["Öğrenci Evrak Yükle'ye basar"]) --> B{"Uzantı .doc, .docx, PDF, JPEG veya PNG mi?"}
     B -->|"hayır"| C["Uyarı göster, dosyayı reddet"]
@@ -18,4 +18,4 @@ flowchart TD
     M --> N["Durum Tamamlandı"]
     N --> O["Admin Tamamlandı sekmesinde görür"]
     O --> P(["Bitiş"])
-    '''
+    ```

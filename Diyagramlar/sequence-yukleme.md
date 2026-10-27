@@ -1,6 +1,6 @@
 # Sıralama diyagramı, UML
 
-'''mermaid
+```mermaid
 sequenceDiagram
     actor Ogrenci
     participant Ctrl as DocumentsController
@@ -25,4 +25,4 @@ sequenceDiagram
     DS->>DB: Durumu güncelle
     DS-->>Ctrl: Rapor
     Ctrl-->>Ogrenci: Rapor ekranı
-    '''
+   ```

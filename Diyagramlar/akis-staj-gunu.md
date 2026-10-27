@@ -1,6 +1,6 @@
 # Staj günü hesabı akışı
 
-'''mermaid
+```mermaid
 flowchart TD
     A(["Başla"]) --> B["Seçilen haftalık günleri ve tarih aralığını al"]
     B --> C["Sayaç = 0, gün = aralığın ilk günü"]
@@ -18,4 +18,4 @@ flowchart TD
     I -->|"hayır"| K["Sonuç: uyuşmazlık, raporda göster"]
     J --> L(["Bitiş"])
     K --> L
-    '''
+    ```

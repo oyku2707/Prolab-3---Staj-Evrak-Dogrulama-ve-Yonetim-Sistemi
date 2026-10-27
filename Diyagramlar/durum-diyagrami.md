@@ -1,6 +1,6 @@
 # Durum diyagramı
 
-'''mermaid
+```mermaid
 stateDiagram-v2
     [*] --> Yuklendi
     Yuklendi --> Inceleniyor : doğrulama başlar
@@ -13,4 +13,4 @@ stateDiagram-v2
         Öğrenci değiştiremez ve silemez.
         Güncelleme ve silme sadece admin sayfasından.
     end note
-    '''
+    ```

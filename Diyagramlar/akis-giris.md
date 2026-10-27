@@ -1,6 +1,6 @@
 # Giriş akışı
 
-'''mermaid
+```mermaid
 flowchart TD
     A(["Başla"]) --> B["Kullanıcı adı veya e-posta ve şifre girilir"]
     B --> C{"Kullanıcı var mı?"}
@@ -19,4 +19,4 @@ flowchart TD
     M --> N{"Rol nedir?"}
     N -->|"ROLE_STUDENT"| O["Öğrenci ana sayfası"]
     N -->|"ROLE_ADMIN"| P["Admin paneli"]
-    '''
+    ```
