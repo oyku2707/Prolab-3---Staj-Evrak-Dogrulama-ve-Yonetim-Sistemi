@@ -1,0 +1,198 @@
+@model StajSistemi.Models.UploadViewModel
+@using StajSistemi.Domain.Enums
+@{
+    ViewData["Title"] = "Evrak Yükle";
+    var yesNo = new SelectList(new[]
+    {
+        new { V = "true", T = "Evet" },
+        new { V = "false", T = "Hayır" }
+    }, "V", "T");
+    var healthOptions = new SelectList(Enumerable.Range(1, 6));
+}
+
+<h2>Evrak Yükle</h2>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
+<form asp-action="Upload" method="post" enctype="multipart/form-data">
+
+    <div class="card mb-3">
+        <div class="card-header">Ek-16 Belgesi</div>
+        <div class="card-body">
+            <label asp-for="File" class="form-label">Dosya seçin</label>
+            <input asp-for="File" type="file" class="form-control"
+                   accept=".doc,.docx,.pdf,.jpg,.jpeg,.png" />
+            <div class="form-text">Kabul edilen biçimler: .doc, .docx, PDF, JPEG, PNG (en fazla 10 MB)</div>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">Öğrenci Bilgileri</div>
+        <div class="card-body row g-3">
+            <div class="col-md-6">
+                <label asp-for="Entered.StudentFullName" class="form-label">Ad Soyad</label>
+                <input asp-for="Entered.StudentFullName" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Entered.Nationality" class="form-label">Uyruk</label>
+                <select asp-for="Entered.Nationality" asp-items="Html.GetEnumSelectList<Nationality>()" class="form-select">
+                    <option value="">Seçiniz</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Entered.TcNo" class="form-label">T.C. / Kimlik No</label>
+                <input asp-for="Entered.TcNo" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Entered.BirthDate" class="form-label">Doğum tarihi</label>
+                <input asp-for="Entered.BirthDate" type="date" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Entered.StudentNo" class="form-label">Öğrenci no</label>
+                <input asp-for="Entered.StudentNo" class="form-control" />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Entered.Department" class="form-label">Bölüm</label>
+                <input asp-for="Entered.Department" class="form-control" />
+            </div>
+            <div class="col-12">
+                <label asp-for="Entered.Address" class="form-label">Adres</label>
+                <input asp-for="Entered.Address" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Entered.PreviousInternshipDays" class="form-label">Önceki staj günü</label>
+                <input asp-for="Entered.PreviousInternshipDays" type="number" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Entered.AcademicYear" class="form-label">Eğitim yılı</label>
+                <input asp-for="Entered.AcademicYear" class="form-control" placeholder="2025-2026 Bahar" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Entered.StudentEmail" class="form-label">E-posta</label>
+                <input asp-for="Entered.StudentEmail" type="email" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Entered.StudentPhone" class="form-label">Telefon</label>
+                <input asp-for="Entered.StudentPhone" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Entered.HealthAidStatus" class="form-label">Sağlık yardımı statüsü</label>
+                <select asp-for="Entered.HealthAidStatus" asp-items="healthOptions" class="form-select">
+                    <option value="">Seçiniz</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">Staj Yapılan Yer</div>
+        <div class="card-body row g-3">
+            <div class="col-md-6">
+                <label asp-for="Entered.CompanyName" class="form-label">Firma adı</label>
+                <input asp-for="Entered.CompanyName" class="form-control" />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Entered.ServiceArea" class="form-label">Hizmet alanı</label>
+                <input asp-for="Entered.ServiceArea" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Entered.CompanyPhone" class="form-label">Telefon</label>
+                <input asp-for="Entered.CompanyPhone" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Entered.CompanyFax" class="form-label">Faks</label>
+                <input asp-for="Entered.CompanyFax" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Entered.CompanyEmail" class="form-label">E-posta</label>
+                <input asp-for="Entered.CompanyEmail" type="email" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Entered.CompanyWeb" class="form-label">Web</label>
+                <input asp-for="Entered.CompanyWeb" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Entered.EngineerCount" class="form-label">Mühendis sayısı</label>
+                <input asp-for="Entered.EngineerCount" type="number" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Entered.EmployeeCount" class="form-label">Çalışan sayısı</label>
+                <input asp-for="Entered.EmployeeCount" type="number" class="form-control" />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Entered.CompanyAddress" class="form-label">Adres</label>
+                <input asp-for="Entered.CompanyAddress" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Entered.StartDate" class="form-label">Başlangıç tarihi</label>
+                <input asp-for="Entered.StartDate" type="date" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Entered.EndDate" class="form-label">Bitiş tarihi</label>
+                <input asp-for="Entered.EndDate" type="date" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Entered.InternshipDays" class="form-label">Staj günü</label>
+                <input asp-for="Entered.InternshipDays" type="number" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Entered.IsAbroad" class="form-label">Yurt dışında mı?</label>
+                <select asp-for="Entered.IsAbroad" asp-items="yesNo" class="form-select">
+                    <option value="">Seçiniz</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Entered.WorksOnWeekends" class="form-label">Hafta sonu çalışılıyor mu?</label>
+                <select asp-for="Entered.WorksOnWeekends" asp-items="yesNo" class="form-select">
+                    <option value="">Seçiniz</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Entered.IsPaid" class="form-label">Ücretli mi?</label>
+                <select asp-for="Entered.IsPaid" asp-items="yesNo" class="form-select">
+                    <option value="">Seçiniz</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">İşveren / Yetkili</div>
+        <div class="card-body row g-3">
+            <div class="col-md-6">
+                <label asp-for="Entered.EmployerFullName" class="form-label">Ad Soyad</label>
+                <input asp-for="Entered.EmployerFullName" class="form-control" />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Entered.EmployerTitle" class="form-label">Unvan</label>
+                <input asp-for="Entered.EmployerTitle" class="form-control" />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Entered.EmployerEmail" class="form-label">E-posta</label>
+                <input asp-for="Entered.EmployerEmail" type="email" class="form-control" />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Entered.EmployerPhone" class="form-label">Telefon</label>
+                <input asp-for="Entered.EmployerPhone" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <div class="form-check">
+                    <input asp-for="Entered.EmployerHasSignature" class="form-check-input" />
+                    <label asp-for="Entered.EmployerHasSignature" class="form-check-label">İşveren imzası var</label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-check">
+                    <input asp-for="Entered.EmployerHasStamp" class="form-check-input" />
+                    <label asp-for="Entered.EmployerHasStamp" class="form-check-label">İşveren kaşesi var</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Yükle</button>
+    <a class="btn btn-outline-secondary" asp-controller="Student" asp-action="Index">İptal</a>
+</form>
