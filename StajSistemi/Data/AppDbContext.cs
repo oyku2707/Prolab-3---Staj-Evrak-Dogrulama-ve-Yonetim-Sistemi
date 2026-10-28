@@ -38,5 +38,7 @@ public class AppDbContext : DbContext
         // Ek16Data ayrı tablo olmasın, Documents tablosunun sütunları olarak gömülsün
         modelBuilder.Entity<Document>()
             .OwnsOne(d => d.ExtractedData);
+         modelBuilder.Entity<Document>()
+            .OwnsOne(d => d.EnteredData);
     }
 }

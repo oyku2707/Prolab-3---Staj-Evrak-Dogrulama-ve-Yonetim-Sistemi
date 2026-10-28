@@ -12,5 +12,6 @@ public class Document
     public DocumentStatus Status { get; set; } = DocumentStatus.Yuklendi;
 
     public Ek16Data? ExtractedData { get; set; }
+    public Ek16Data? EnteredData { get; set; }
     public List<ValidationResultRecord> Results { get; set; } = new();
 }

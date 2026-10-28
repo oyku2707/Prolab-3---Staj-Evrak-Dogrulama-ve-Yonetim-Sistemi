@@ -169,7 +169,7 @@ namespace StajSistemi.Migrations
                     b.Property<int>("PreviousInternshipDays")
                         .HasColumnType("int");
 
-                    b.Property<int>("StudentId")
+                    b.Property<int?>("StudentId")
                         .HasColumnType("int");
 
                     b.Property<string>("StudentNo")
@@ -293,6 +293,124 @@ namespace StajSistemi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.OwnsOne("StajSistemi.Domain.Entities.Ek16Data", "EnteredData", b1 =>
+                        {
+                            b1.Property<int>("DocumentId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("AcademicYear")
+                                .HasColumnType("longtext");
+
+                            b1.Property<string>("Address")
+                                .HasColumnType("longtext");
+
+                            b1.Property<bool>("AdvisorApprovalFilled")
+                                .HasColumnType("tinyint(1)");
+
+                            b1.Property<DateTime?>("BirthDate")
+                                .HasColumnType("datetime(6)");
+
+                            b1.Property<string>("CompanyAddress")
+                                .HasColumnType("longtext");
+
+                            b1.Property<string>("CompanyEmail")
+                                .HasColumnType("longtext");
+
+                            b1.Property<string>("CompanyFax")
+                                .HasColumnType("longtext");
+
+                            b1.Property<string>("CompanyName")
+                                .HasColumnType("longtext");
+
+                            b1.Property<string>("CompanyPhone")
+                                .HasColumnType("longtext");
+
+                            b1.Property<string>("CompanyWeb")
+                                .HasColumnType("longtext");
+
+                            b1.Property<string>("Department")
+                                .HasColumnType("longtext");
+
+                            b1.Property<int?>("EmployeeCount")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("EmployerEmail")
+                                .HasColumnType("longtext");
+
+                            b1.Property<string>("EmployerFullName")
+                                .HasColumnType("longtext");
+
+                            b1.Property<bool>("EmployerHasSignature")
+                                .HasColumnType("tinyint(1)");
+
+                            b1.Property<bool>("EmployerHasStamp")
+                                .HasColumnType("tinyint(1)");
+
+                            b1.Property<string>("EmployerPhone")
+                                .HasColumnType("longtext");
+
+                            b1.Property<string>("EmployerTitle")
+                                .HasColumnType("longtext");
+
+                            b1.Property<DateTime?>("EndDate")
+                                .HasColumnType("datetime(6)");
+
+                            b1.Property<int?>("EngineerCount")
+                                .HasColumnType("int");
+
+                            b1.Property<int?>("HealthAidStatus")
+                                .HasColumnType("int");
+
+                            b1.Property<int?>("InternshipDays")
+                                .HasColumnType("int");
+
+                            b1.Property<bool?>("IsAbroad")
+                                .HasColumnType("tinyint(1)");
+
+                            b1.Property<bool?>("IsPaid")
+                                .HasColumnType("tinyint(1)");
+
+                            b1.Property<int?>("Nationality")
+                                .HasColumnType("int");
+
+                            b1.Property<int?>("PreviousInternshipDays")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("ServiceArea")
+                                .HasColumnType("longtext");
+
+                            b1.Property<DateTime?>("StartDate")
+                                .HasColumnType("datetime(6)");
+
+                            b1.Property<bool>("StudentApprovalFilled")
+                                .HasColumnType("tinyint(1)");
+
+                            b1.Property<string>("StudentEmail")
+                                .HasColumnType("longtext");
+
+                            b1.Property<string>("StudentFullName")
+                                .HasColumnType("longtext");
+
+                            b1.Property<string>("StudentNo")
+                                .HasColumnType("longtext");
+
+                            b1.Property<string>("StudentPhone")
+                                .HasColumnType("longtext");
+
+                            b1.Property<string>("TcNo")
+                                .HasColumnType("longtext");
+
+                            b1.Property<bool?>("WorksOnWeekends")
+                                .HasColumnType("tinyint(1)");
+
+                            b1.HasKey("DocumentId");
+
+                            b1.ToTable("Documents");
+
+                            b1.WithOwner()
+                                .HasForeignKey("DocumentId");
+                        });
+
                     b.OwnsOne("StajSistemi.Domain.Entities.Ek16Data", "ExtractedData", b1 =>
                         {
                             b1.Property<int>("DocumentId")
@@ -411,6 +529,8 @@ namespace StajSistemi.Migrations
                                 .HasForeignKey("DocumentId");
                         });
 
+                    b.Navigation("EnteredData");
+
                     b.Navigation("ExtractedData");
                 });
 
@@ -418,9 +538,7 @@ namespace StajSistemi.Migrations
                 {
                     b.HasOne("StajSistemi.Domain.Entities.Student", null)
                         .WithOne("Profile")
-                        .HasForeignKey("StajSistemi.Domain.Entities.StudentProfile", "StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("StajSistemi.Domain.Entities.StudentProfile", "StudentId");
                 });
 
             modelBuilder.Entity("StajSistemi.Domain.Entities.ValidationResultRecord", b =>

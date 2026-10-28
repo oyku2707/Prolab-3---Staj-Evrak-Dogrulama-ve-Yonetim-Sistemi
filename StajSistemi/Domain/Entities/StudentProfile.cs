@@ -5,7 +5,7 @@ namespace StajSistemi.Domain.Entities;
 public class StudentProfile
 {
     public int Id { get; set; }
-    public int StudentId { get; set; }
+    public int? StudentId { get; set; }
     public string FullName { get; set; } = "";
     public string TcNo { get; set; } = "";
     public string StudentNo { get; set; } = "";
