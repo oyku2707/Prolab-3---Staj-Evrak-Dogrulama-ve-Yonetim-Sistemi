@@ -12,4 +12,5 @@ public class UploadResult
 public interface IDocumentService
 {
     Task<UploadResult> UploadAsync(int studentId, IFormFile? file, Ek16Data entered);
+    Task<UploadResult> ReuploadAsync(int documentId, int studentId, IFormFile? file, Ek16Data entered);
 }

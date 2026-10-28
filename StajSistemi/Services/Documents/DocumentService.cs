@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using StajSistemi.Data;
 using StajSistemi.Domain.Entities;
 using StajSistemi.Domain.Enums;
@@ -28,25 +29,16 @@ public class DocumentService : IDocumentService
 
     public async Task<UploadResult> UploadAsync(int studentId, IFormFile? file, Ek16Data entered)
     {
-        // 1) Format kontrolleri
-        if (file == null || file.Length == 0)
-            return Fail("Lütfen bir dosya seçin. Boş dosya yüklenemez.");
+        var error = CheckFile(file);
+        if (error != null) return Fail(error);
 
-        var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-        if (!AllowedExtensions.Contains(extension))
-            return Fail("Bu dosya biçimi kabul edilmiyor. İzin verilenler: .doc, .docx, .pdf, .jpg, .jpeg, .png");
-
-        if (file.Length > MaxFileSize)
-            return Fail("Dosya boyutu en fazla 10 MB olabilir.");
-
-        // 2) Kaydet, Document oluştur (EnteredData doğrulamadan ÖNCE kaydedilir)
-        var path = await _storage.SaveAsync(file);
+        var path = await _storage.SaveAsync(file!);
 
         var document = new Document
         {
             StudentId = studentId,
             FilePath = path,
-            FileType = extension,
+            FileType = Path.GetExtension(file!.FileName).ToLowerInvariant(),
             UploadedAt = DateTime.Now,
             Status = DocumentStatus.Yuklendi,
             EnteredData = entered
@@ -54,21 +46,70 @@ public class DocumentService : IDocumentService
         _db.Documents.Add(document);
         await _db.SaveChangesAsync();
 
-        // 3) Yuklendi -> Inceleniyor
+        await RunValidationAsync(document);
+        return new UploadResult { Success = true, DocumentId = document.Id };
+    }
+
+    public async Task<UploadResult> ReuploadAsync(int documentId, int studentId, IFormFile? file, Ek16Data entered)
+    {
+        var document = await _db.Documents
+            .Include(d => d.Results)
+            .FirstOrDefaultAsync(d => d.Id == documentId);
+
+        if (document == null || document.StudentId != studentId)
+            return Fail("Belge bulunamadı.");
+
+        // Tamamlandı kilidi: sunucu tarafında engellenir.
+        if (!_status.CanStudentModify(document))
+            return Fail("Bu belge tamamlandı, değiştirilemez.");
+
+        if (document.Status != DocumentStatus.HataliEksik)
+            return Fail("Sadece Hatalı / Eksik belgeler yeniden yüklenebilir.");
+
+        var error = CheckFile(file);
+        if (error != null) return Fail(error);
+
+        _db.ValidationResults.RemoveRange(document.Results);
+        document.FilePath = await _storage.SaveAsync(file!);
+        document.FileType = Path.GetExtension(file!.FileName).ToLowerInvariant();
+        document.UploadedAt = DateTime.Now;
+        document.EnteredData = entered;
+
+        _status.Transition(document, DocumentStatus.Yuklendi);
+        await _db.SaveChangesAsync();
+
+        await RunValidationAsync(document);
+        return new UploadResult { Success = true, DocumentId = document.Id };
+    }
+
+    // Yuklendi -> Inceleniyor -> doğrulama sonucu -> (Onaylandi ise) Tamamlandi
+    private async Task RunValidationAsync(Document document)
+    {
         _status.Transition(document, DocumentStatus.Inceleniyor);
         await _db.SaveChangesAsync();
 
-        // 4) Doğrulama, dönen önerilen statüyü uygula
         var suggested = await _validation.ValidateAsync(document.Id);
         _status.Transition(document, suggested);
 
-        // 5) Onaylandı ise hemen Tamamlandı
         if (document.Status == DocumentStatus.Onaylandi)
             _status.Transition(document, DocumentStatus.Tamamlandi);
 
         await _db.SaveChangesAsync();
+    }
 
-        return new UploadResult { Success = true, DocumentId = document.Id };
+    private static string? CheckFile(IFormFile? file)
+    {
+        if (file == null || file.Length == 0)
+            return "Lütfen bir dosya seçin. Boş dosya yüklenemez.";
+
+        var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+        if (!AllowedExtensions.Contains(ext))
+            return "Bu dosya biçimi kabul edilmiyor. İzin verilenler: .doc, .docx, .pdf, .jpg, .jpeg, .png";
+
+        if (file.Length > MaxFileSize)
+            return "Dosya boyutu en fazla 10 MB olabilir.";
+
+        return null;
     }
 
     private static UploadResult Fail(string error) => new() { Success = false, Error = error };

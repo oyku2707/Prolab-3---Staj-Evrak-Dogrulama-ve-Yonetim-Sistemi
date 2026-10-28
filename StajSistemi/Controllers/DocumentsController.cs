@@ -23,7 +23,24 @@ public class DocumentsController : Controller
     }
 
     [HttpGet]
-    public IActionResult Upload() => View(new UploadViewModel());
+    public async Task<IActionResult> Upload(int? id)
+    {
+        var model = new UploadViewModel();
+
+        if (id != null)
+        {
+            var document = await _db.Documents.FirstOrDefaultAsync(d => d.Id == id);
+            if (document == null || document.StudentId != _currentUser.UserId)
+                return NotFound();
+            if (document.Status != DocumentStatus.HataliEksik)
+                return RedirectToAction("Report", new { id });
+
+            model.DocumentId = document.Id;
+            model.Entered = document.EnteredData ?? new();
+        }
+
+        return View(model);
+    }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -32,7 +49,9 @@ public class DocumentsController : Controller
         if (_currentUser.UserId is not int studentId)
             return Unauthorized();
 
-        var result = await _documents.UploadAsync(studentId, model.File, model.Entered);
+        var result = model.DocumentId is int docId
+            ? await _documents.ReuploadAsync(docId, studentId, model.File, model.Entered)
+            : await _documents.UploadAsync(studentId, model.File, model.Entered);
 
         if (!result.Success)
         {

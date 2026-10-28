@@ -73,7 +73,7 @@
 
 @if (Model.Status == DocumentStatus.HataliEksik)
 {
-    <a class="btn btn-primary" asp-action="Upload">Düzeltilmiş belgeyi yükle</a>
+    <a class="btn btn-primary" asp-action="Upload" asp-route-id="@Model.DocumentId">Düzeltilmiş belgeyi yükle</a>
 }
 else if (Model.Status == DocumentStatus.Tamamlandi)
 {
