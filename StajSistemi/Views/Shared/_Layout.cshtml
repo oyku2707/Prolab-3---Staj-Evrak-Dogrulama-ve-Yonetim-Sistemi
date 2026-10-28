@@ -1,5 +1,7 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@using StajSistemi.Services
+@inject ICurrentUserService CurrentUser
+<!DOCTYPE html>
+<html lang="tr">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -20,13 +22,42 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+                        @if (CurrentUser.UserId == null)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" href="/Account/Login">Giriş</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" href="/Account/Register">Kayıt Ol</a>
+                            </li>
+                        }
+                        else if (CurrentUser.IsAdmin)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Admin" asp-action="Documents">Başvurular</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Admin" asp-action="Completed">Tamamlananlar</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" href="/Dataset/Upload">Veri Seti Yükle</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Student" asp-action="Index">Belgelerim</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Documents" asp-action="Upload">Evrak Yükle</a>
+                            </li>
+                        }
                     </ul>
+                    @if (CurrentUser.UserId != null)
+                    {
+                        <span class="navbar-text me-3">@(CurrentUser.IsAdmin ? "Admin" : "Öğrenci")</span>
+                        <a class="nav-link text-dark" href="/Account/Logout">Çıkış</a>
+                    }
                 </div>
             </div>
         </nav>
@@ -39,7 +70,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2026 - StajSistemi - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2026 - StajSistemi
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
