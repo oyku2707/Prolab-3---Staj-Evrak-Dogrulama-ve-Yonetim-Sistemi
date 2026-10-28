@@ -5,6 +5,10 @@
 }
 
 <h2>Belge Detayı</h2>
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success">@TempData["Message"]</div>
+}
 
 <div class="card mb-3">
     <div class="card-body row">
@@ -90,6 +94,7 @@
 }
 
 <a class="btn btn-outline-secondary" asp-action="Documents">Listeye dön</a>
+<a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model.DocumentId">Düzenle</a>
 <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Sil</button>
 
 <div class="modal fade" id="deleteModal" tabindex="-1">

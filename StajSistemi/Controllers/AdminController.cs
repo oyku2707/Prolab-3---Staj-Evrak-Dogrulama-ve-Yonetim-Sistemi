@@ -98,6 +98,38 @@ public class AdminController : Controller
         return View(model);
     }
 
+    [HttpGet]
+    public async Task<IActionResult> Edit(int id)
+    {
+        var document = await _db.Documents.FirstOrDefaultAsync(d => d.Id == id);
+        if (document == null) return NotFound();
+
+        var model = new UploadViewModel
+        {
+            DocumentId = document.Id,
+            Entered = document.EnteredData ?? new()
+        };
+        return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(UploadViewModel model)
+    {
+        if (model.DocumentId is not int id)
+            return NotFound();
+
+        var result = await _adminDocs.UpdateAsync(id, model.Entered, model.File);
+        if (!result.Success)
+        {
+            ViewBag.Error = result.Error;
+            return View(model);
+        }
+
+        TempData["Message"] = "Belge güncellendi.";
+        return RedirectToAction("Details", new { id });
+    }
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id)
