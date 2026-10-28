@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using StajSistemi.Data;
+using StajSistemi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,8 +11,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+    
 });
 
+builder.Services.AddScoped<ICurrentUserService, FakeCurrentUserService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
