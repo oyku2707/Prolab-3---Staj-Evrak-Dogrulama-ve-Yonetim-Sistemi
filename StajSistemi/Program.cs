@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using StajSistemi.Data;
 using StajSistemi.Services;
+using StajSistemi.Domain.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 
 builder.Services.AddScoped<ICurrentUserService, FakeCurrentUserService>();
+builder.Services.AddScoped<IValidationService, FakeValidationService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
