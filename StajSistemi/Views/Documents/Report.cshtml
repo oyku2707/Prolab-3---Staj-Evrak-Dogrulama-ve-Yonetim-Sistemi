@@ -1,0 +1,83 @@
+@using StajSistemi.Helpers
+@using StajSistemi.Domain.Enums
+@model StajSistemi.Models.ReportViewModel
+@{
+    ViewData["Title"] = "Rapor";
+}
+
+<h2>Doğrulama Raporu</h2>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4"><strong>Biçim:</strong> @Model.FileType</div>
+            <div class="col-md-4"><strong>Yükleme tarihi:</strong> @Model.UploadedAt.ToString("dd.MM.yyyy HH:mm")</div>
+            <div class="col-md-4">
+                <strong>Statü:</strong>
+                <span class="badge @StatusDisplay.BadgeClass(Model.Status)">@StatusDisplay.Label(Model.Status)</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3 text-center">
+    <div class="col"><div class="alert alert-success mb-0">Geçen kontrol: <strong>@Model.Passed.Count</strong></div></div>
+    <div class="col"><div class="alert alert-danger mb-0">Hata: <strong>@Model.Errors.Count</strong></div></div>
+    <div class="col"><div class="alert alert-warning mb-0">Uyarı: <strong>@Model.Warnings.Count</strong></div></div>
+</div>
+
+@if (Model.Errors.Any())
+{
+    <div class="alert alert-danger">
+        <h5>Hatalar</h5>
+        <ul class="mb-0">
+            @foreach (var e in Model.Errors)
+            {
+                <li>
+                    <strong>@e.FieldName:</strong> @e.Message
+                    @if (!string.IsNullOrEmpty(e.Suggestion))
+                    {
+                        <br /><small>Öneri: @e.Suggestion</small>
+                    }
+                </li>
+            }
+        </ul>
+    </div>
+}
+
+@if (Model.Warnings.Any())
+{
+    <div class="alert alert-warning">
+        <h5>Uyarılar</h5>
+        <ul class="mb-0">
+            @foreach (var w in Model.Warnings)
+            {
+                <li><strong>@w.FieldName:</strong> @w.Message</li>
+            }
+        </ul>
+    </div>
+}
+
+@if (Model.Passed.Any())
+{
+    <details class="mb-3">
+        <summary class="text-success">Geçen kontroller (@Model.Passed.Count)</summary>
+        <ul class="mt-2">
+            @foreach (var p in Model.Passed)
+            {
+                <li class="text-success">@p.FieldName: @p.Message</li>
+            }
+        </ul>
+    </details>
+}
+
+@if (Model.Status == DocumentStatus.HataliEksik)
+{
+    <a class="btn btn-primary" asp-action="Upload">Düzeltilmiş belgeyi yükle</a>
+}
+else if (Model.Status == DocumentStatus.Tamamlandi)
+{
+    <div class="alert alert-secondary">Bu belge tamamlandı, değiştirilemez.</div>
+}
+
+<a class="btn btn-outline-secondary" asp-controller="Student" asp-action="Index">Belgelerime dön</a>
