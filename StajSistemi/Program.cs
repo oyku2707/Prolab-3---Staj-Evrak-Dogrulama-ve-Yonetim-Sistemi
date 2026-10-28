@@ -21,7 +21,7 @@ builder.Services.AddScoped<IValidationService, FakeValidationService>();
 builder.Services.AddScoped<IDocumentStatusService, DocumentStatusService>();
 builder.Services.AddScoped<IFileStorage, FileStorage>();
 builder.Services.AddScoped<IDocumentService, DocumentService>();
-
+builder.Services.AddScoped<IAdminDocumentService, AdminDocumentService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
