@@ -94,4 +94,32 @@ public class DocumentsController : Controller
 
         return View(model);
     }
+
+    [HttpGet]
+    public async Task<IActionResult> GoogleForm(int id)
+    {
+        var document = await _db.Documents.FirstOrDefaultAsync(d => d.Id == id);
+        if (document == null || document.StudentId != _currentUser.UserId)
+            return NotFound();
+
+        return View(new GoogleFormViewModel { DocumentId = id });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> GoogleForm(GoogleFormViewModel model)
+    {
+        var document = await _db.Documents.FirstOrDefaultAsync(d => d.Id == model.DocumentId);
+        if (document == null || document.StudentId != _currentUser.UserId)
+            return NotFound();
+
+        var url = model.Url?.Trim();
+        var ok = Uri.TryCreate(url, UriKind.Absolute, out var uri)
+                 && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)
+                 && (uri.Host == "docs.google.com" || uri.Host == "forms.gle");
+
+        model.Valid = ok;
+        model.Error = ok ? null : "Geçersiz adres. Lütfen bir Google Form bağlantısı girin (docs.google.com veya forms.gle).";
+        return View(model);
+    }
 }

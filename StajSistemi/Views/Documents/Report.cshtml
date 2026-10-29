@@ -79,5 +79,5 @@ else if (Model.Status == DocumentStatus.Tamamlandi)
 {
     <div class="alert alert-secondary">Bu belge tamamlandı, değiştirilemez.</div>
 }
-
+<a class="btn btn-outline-primary" asp-action="GoogleForm" asp-route-id="@Model.DocumentId">Google Form URL gir</a>
 <a class="btn btn-outline-secondary" asp-controller="Student" asp-action="Index">Belgelerime dön</a>
