@@ -6,7 +6,12 @@ public class TcKimlikRule : ValidationRuleBase
 {
     public override string Name => "Kimlik numarası";
 
-    public override ValidationResult Validate(ValidationContext context)
+    public override IEnumerable<ValidationResult> Validate(ValidationContext context)
+    {
+        return [CheckTc(context)];
+    }
+
+    private ValidationResult CheckTc(ValidationContext context)
     {
         var tc = context.Data.TcNo?.Trim();
         var nationality = context.Data.Nationality;
@@ -19,7 +24,7 @@ public class TcKimlikRule : ValidationRuleBase
 
         if (tc.Length != 11 || !tc.All(c => c >= '0' && c <= '9'))
             return Fail("TcNo", "Kimlik numarası 11 haneli olmalı ve sadece rakamlardan oluşmalıdır.");
-        
+
         if (nationality == Nationality.TC)
         {
             if (tc[0] == '0')
@@ -39,6 +44,7 @@ public class TcKimlikRule : ValidationRuleBase
             if (!tc.StartsWith("99"))
                 return Fail("TcNo", "Yabancı uyruklu için kimlik numarası 99 ile başlamalıdır.");
         }
+
         return Pass("TcNo");
     }
 }
