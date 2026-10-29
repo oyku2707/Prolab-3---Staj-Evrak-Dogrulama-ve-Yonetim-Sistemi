@@ -1,0 +1,52 @@
+@model StajSistemi.Models.InternshipDaysViewModel
+@{
+    ViewData["Title"] = "Staj Günü Seçimi";
+    var days = new[]
+    {
+        ("Monday", "Pazartesi"), ("Tuesday", "Salı"), ("Wednesday", "Çarşamba"),
+        ("Thursday", "Perşembe"), ("Friday", "Cuma"), ("Saturday", "Cumartesi"), ("Sunday", "Pazar")
+    };
+}
+
+<h2>Staj Günü Seçimi</h2>
+
+@if (Model.Saved)
+{
+    <div class="alert alert-success">Staj günleri kaydedildi.</div>
+}
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="alert alert-danger">@Model.Error</div>
+}
+
+<form asp-action="InternshipDays" method="post">
+    <input type="hidden" asp-for="DocumentId" />
+
+    <div class="card mb-3">
+        <div class="card-header">Haftalık staj günleri</div>
+        <div class="card-body">
+            @foreach (var (value, label) in days)
+            {
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="SelectedDays"
+                           value="@value" id="day-@value" checked="@Model.SelectedDays.Contains(value)" />
+                    <label class="form-check-label" for="day-@value">@label</label>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-md-3">
+            <label asp-for="RangeStart" class="form-label">Başlangıç tarihi</label>
+            <input asp-for="RangeStart" type="date" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label asp-for="RangeEnd" class="form-label">Bitiş tarihi</label>
+            <input asp-for="RangeEnd" type="date" class="form-control" />
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+    <a class="btn btn-outline-secondary" asp-action="Report" asp-route-id="@Model.DocumentId">Rapora dön</a>
+</form>
