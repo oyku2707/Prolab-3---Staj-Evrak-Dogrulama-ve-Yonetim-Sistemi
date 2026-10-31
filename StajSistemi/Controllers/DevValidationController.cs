@@ -118,7 +118,7 @@ public class DevValidationController : Controller
     if (!_env.IsDevelopment())
         return NotFound();
 
-    var path = Path.Combine(_env.ContentRootPath, "TestBelgeleri", "ornek1.docx");
+    var path = Path.Combine(_env.ContentRootPath, "TestBelgeleri", "ornek2_hatali.docx");
     if (!System.IO.File.Exists(path))
         return Content("Dosya bulunamadı: " + path);
 
