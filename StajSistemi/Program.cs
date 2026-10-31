@@ -21,6 +21,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     builder.Services.AddScoped<IValidationRule, EmailRule>();
     builder.Services.AddScoped<IValidationRule, EngineerCountRule>();
     builder.Services.AddScoped<ValidationService>();
+    builder.Services.AddScoped<IValidationRule, FormVsDocumentRule>();
 
 
 var app = builder.Build();

@@ -7,6 +7,7 @@ using StajSistemi.Validation;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using StajSistemi.Services.Extractors;
+using StajSistemi.Validation.Rules;
 
 namespace StajSistemi.Controllers;
 
@@ -160,6 +161,38 @@ public class DevValidationController : Controller
     foreach (var line in extractor.Log) sb.AppendLine("  " + line);
     foreach (var p in typeof(Ek16Data).GetProperties())
         sb.AppendLine($"{p.Name} = {p.GetValue(data) ?? "(boş)"}");
+
+    return Content(sb.ToString(), "text/plain; charset=utf-8");
+}
+public IActionResult CompareDocx()
+{
+    if (!_env.IsDevelopment())
+        return NotFound();
+
+    var path = Path.Combine(_env.ContentRootPath, "TestBelgeleri", "ornek1.docx");
+    if (!System.IO.File.Exists(path))
+        return Content("Dosya bulunamadı: " + path);
+
+    var extractor = new DocxFieldExtractor();
+    var data = extractor.Extract(path);       // belgeden okunan
+    var entered = extractor.Extract(path);    // "formdan girilmiş" gibi: aynı bilgiler...
+
+    // ...ve beş bilinçli fark:
+    entered.StudentFullName = "Deneme Öğrencii";    // yazım farkı
+    entered.StudentPhone = "+90 532 999 99 99";     // farklı numara
+    entered.EngineerCount = 7;                      // farklı sayı
+    entered.CompanyEmail = null;                    // formda boş
+    data.EmployerPhone = null;                      // belgede okunamamış gibi
+
+    var context = new ValidationContext { Data = data, Entered = entered };
+
+    var sb = new StringBuilder();
+    foreach (var r in _service.RunRules(context)
+                 .Where(r => r.RuleName == FormVsDocumentRule.RuleDisplayName))
+    {
+        var tag = r.IsValid ? "GEÇTİ" : "HATA ";
+        sb.AppendLine($"[{tag}] {r.FieldName}: {r.Message}");
+    }
 
     return Content(sb.ToString(), "text/plain; charset=utf-8");
 }
