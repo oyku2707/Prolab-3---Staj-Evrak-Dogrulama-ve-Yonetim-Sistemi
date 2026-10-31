@@ -4,6 +4,9 @@ using StajSistemi.Domain.Entities;
 using StajSistemi.Domain.Enums;
 using StajSistemi.Services;
 using StajSistemi.Validation;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
+using StajSistemi.Services.Extractors;
 
 namespace StajSistemi.Controllers;
 
@@ -30,9 +33,14 @@ public class DevValidationController : Controller
 
         var c2 = new Ek16Data
         {
-            TcNo = "10000000147", Nationality = Nationality.TC,
-            StudentPhone = "0532 123 45 67", CompanyPhone = "+905321234567", EmployerPhone = "+90 532 123 45",
-            StudentEmail = "ad@alanadi", CompanyEmail = "ad@@alanadi.com", EmployerEmail = "ad alanadi@x.com",
+            TcNo = "10000000147",
+            Nationality = Nationality.TC,
+            StudentPhone = "0532 123 45 67",
+            CompanyPhone = "+905321234567",
+            EmployerPhone = "+90 532 123 45",
+            StudentEmail = "ad@alanadi",
+            CompanyEmail = "ad@@alanadi.com",
+            EmployerEmail = "ad alanadi@x.com",
             EngineerCount = 3
         };
         cases.Add(("2) Hepsi hatalı", c2));
@@ -70,12 +78,102 @@ public class DevValidationController : Controller
 
         return Content(sb.ToString(), "text/plain; charset=utf-8");
     }
+    public IActionResult DumpDocx()
+    {
+        if (!_env.IsDevelopment())
+            return NotFound();
+
+        var path = Path.Combine(_env.ContentRootPath, "TestBelgeleri", "ornek1.docx");
+        if (!System.IO.File.Exists(path))
+            return Content("Dosya bulunamadı: " + path);
+
+        var sb = new StringBuilder();
+        using var wp = WordprocessingDocument.Open(path, false);
+        var body = wp.MainDocumentPart!.Document.Body!;
+        var tables = body.Elements<Table>().ToList();
+
+        for (int t = 0; t < tables.Count; t++)
+        {
+            sb.AppendLine($"=== TABLO {t} ===");
+            var rows = tables[t].Elements<TableRow>().ToList();
+            for (int r = 0; r < rows.Count; r++)
+            {
+                var cells = rows[r].Elements<TableCell>().Select(c => c.InnerText.Trim()).ToList();
+                sb.AppendLine($"[{r}] " + string.Join(" | ", cells));
+            }
+        }
+        sb.AppendLine();
+        sb.AppendLine("=== TABLO DIŞI PARAGRAFLAR ===");
+        foreach (var p in body.Elements<Paragraph>())
+        {
+            var text = p.InnerText.Trim();
+            if (!string.IsNullOrEmpty(text))
+                sb.AppendLine("- " + text);
+        }
+
+        return Content(sb.ToString(), "text/plain; charset=utf-8");
+    }
+    public IActionResult ExtractDocx()
+{
+    if (!_env.IsDevelopment())
+        return NotFound();
+
+    var path = Path.Combine(_env.ContentRootPath, "TestBelgeleri", "ornek1.docx");
+    if (!System.IO.File.Exists(path))
+        return Content("Dosya bulunamadı: " + path);
+
+    var sb = new StringBuilder();
+
+    using (var wp = WordprocessingDocument.Open(path, false))
+    {
+        var tables = wp.MainDocumentPart!.Document.Body!.Elements<Table>().ToList();
+        sb.AppendLine("Tablo sayısı: " + tables.Count);
+        var body = wp.MainDocumentPart!.Document.Body!;
+        sb.AppendLine("Descendants<Table> sayısı: " + body.Descendants<Table>().Count());
+        foreach (var g in body.ChildElements.GroupBy(e => e.GetType().Name))
+        sb.AppendLine($"  Body çocuğu: {g.Key} x{g.Count()}");
+
+        if (tables.Count > 0)
+        {
+            var rows = tables[0].Elements<TableRow>().ToList();
+            sb.AppendLine("Tablo 0 satır sayısı: " + rows.Count);
+
+            if (rows.Count > 1)
+            {
+                var cells = rows[1].Elements<TableCell>().ToList();
+                sb.AppendLine("2. satırdaki hücre sayısı: " + cells.Count);
+                foreach (var c in cells)
+                {
+                    var text = c.InnerText;
+                    var codes = string.Join(" ", text.Take(12).Select(ch => ((int)ch).ToString("X4")));
+                    sb.AppendLine($"  hücre: '{text}' | ilk 12 karakterin kodu: {codes}");
+                }
+            }
+        }
+    }
+
+    sb.AppendLine();
+    sb.AppendLine("--- Extractor sonucu ---");
+    var extractor = new DocxFieldExtractor();
+    var data = extractor.Extract(path);
+    sb.AppendLine("Extractor sürümü: " + DocxFieldExtractor.Version);
+    foreach (var line in extractor.Log) sb.AppendLine("  " + line);
+    foreach (var p in typeof(Ek16Data).GetProperties())
+        sb.AppendLine($"{p.Name} = {p.GetValue(data) ?? "(boş)"}");
+
+    return Content(sb.ToString(), "text/plain; charset=utf-8");
+}
 
     private static Ek16Data Baseline() => new()
     {
-        TcNo = "10000000146", Nationality = Nationality.TC,
-        StudentPhone = "+90 532 123 45 67", CompanyPhone = "+90 212 123 45 67", EmployerPhone = "+90 216 123 45 67",
-        StudentEmail = "ogrenci@univ.edu.tr", CompanyEmail = "info@firma.com", EmployerEmail = "yetkili@firma.com",
+        TcNo = "10000000146",
+        Nationality = Nationality.TC,
+        StudentPhone = "+90 532 123 45 67",
+        CompanyPhone = "+90 212 123 45 67",
+        EmployerPhone = "+90 216 123 45 67",
+        StudentEmail = "ogrenci@univ.edu.tr",
+        CompanyEmail = "info@firma.com",
+        EmployerEmail = "yetkili@firma.com",
         EngineerCount = 6
     };
 }
