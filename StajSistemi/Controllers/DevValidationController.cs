@@ -8,6 +8,8 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using StajSistemi.Services.Extractors;
 using StajSistemi.Validation.Rules;
+using Microsoft.EntityFrameworkCore;
+using StajSistemi.Data;
 
 namespace StajSistemi.Controllers;
 
@@ -193,6 +195,51 @@ public IActionResult CompareDocx()
         var tag = r.IsValid ? "GEÇTİ" : "HATA ";
         sb.AppendLine($"[{tag}] {r.FieldName}: {r.Message}");
     }
+
+    return Content(sb.ToString(), "text/plain; charset=utf-8");
+}
+public async Task<IActionResult> ValidateDocTest(
+    [FromServices] AppDbContext db,
+    [FromServices] StajSistemi.Domain.Interfaces.IValidationService validation,
+    string file = "ornek1.docx")
+{
+    if (!_env.IsDevelopment())
+        return NotFound();
+
+    var student = await db.Students.FirstOrDefaultAsync();
+    if (student is null)
+        return Content("Veri tabanında öğrenci yok. Önce Workbench'te deneme öğrencisi ekle.");
+
+    var path = Path.Combine(_env.ContentRootPath, "TestBelgeleri", Path.GetFileName(file));
+    if (!System.IO.File.Exists(path))
+        return Content("Dosya bulunamadı: " + path);
+
+    var doc = new StajSistemi.Domain.Entities.Document
+    {
+        StudentId = student.Id,
+        FilePath = path,
+        FileType = Path.GetExtension(path),
+        UploadedAt = DateTime.UtcNow,
+        Status = DocumentStatus.Yuklendi,
+        EnteredData = new DocxFieldExtractor().Extract(path)   // "form" belgeyle aynı: karşılaştırma geçmeli
+    };
+    db.Documents.Add(doc);
+    await db.SaveChangesAsync();
+
+    var status = await validation.ValidateAsync(doc.Id);
+
+    var saved = await db.ValidationResults.Where(r => r.DocumentId == doc.Id).ToListAsync();
+
+    var sb = new StringBuilder();
+    sb.AppendLine("Dosya: " + Path.GetFileName(path));
+    sb.AppendLine("Önerilen statü: " + status);
+    sb.AppendLine("Kaydedilen sonuç sayısı: " + saved.Count);
+    sb.AppendLine();
+    foreach (var r in saved.Where(r => !r.IsValid))
+        sb.AppendLine($"[{(r.Severity == Severity.Warning ? "UYARI" : "HATA ")}] {r.RuleName} / {r.FieldName}: {r.Message}");
+
+    db.Documents.Remove(doc);   // temizlik
+    await db.SaveChangesAsync();
 
     return Content(sb.ToString(), "text/plain; charset=utf-8");
 }
