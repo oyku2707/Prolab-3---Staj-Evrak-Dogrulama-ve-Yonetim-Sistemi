@@ -3,6 +3,7 @@ using StajSistemi.Data;
 using StajSistemi.Domain.Interfaces;
 using StajSistemi.Services;
 using StajSistemi.Validation.Rules;
+using StajSistemi.Services.Extractors;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     builder.Services.AddScoped<IValidationRule, EngineerCountRule>();
     builder.Services.AddScoped<ValidationService>();
     builder.Services.AddScoped<IValidationRule, FormVsDocumentRule>();
+    builder.Services.AddScoped<IDocumentFieldExtractor, DocxFieldExtractor>();
+    builder.Services.AddScoped<IValidationService, ValidationService>(); 
 
 
 var app = builder.Build();
