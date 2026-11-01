@@ -21,7 +21,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     builder.Services.AddScoped<IValidationRule, PhoneRule>();
     builder.Services.AddScoped<IValidationRule, EmailRule>();
     builder.Services.AddScoped<IValidationRule, EngineerCountRule>();
-    builder.Services.AddScoped<ValidationService>();
     builder.Services.AddScoped<IValidationRule, FormVsDocumentRule>();
     builder.Services.AddScoped<IDocumentFieldExtractor, DocxFieldExtractor>();
     builder.Services.AddScoped<IValidationService, ValidationService>(); 

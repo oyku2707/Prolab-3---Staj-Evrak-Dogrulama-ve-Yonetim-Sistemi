@@ -11,8 +11,6 @@ namespace StajSistemi.Services.Extractors;
 
 public class DocxFieldExtractor : IDocumentFieldExtractor
 {
-    public const string Version = "v3";
-    public List<string> Log { get; } = new();
     private static readonly CultureInfo Tr = new("tr-TR");
 
     public bool Supports(string fileExtension) =>
@@ -36,11 +34,7 @@ public class DocxFieldExtractor : IDocumentFieldExtractor
 
         var approvals = FindTable(tables, "BELGE ÜZERİNDEKİ BİLGİLERİN");
         if (approvals != null) ReadApprovals(approvals, data);
-        Log.Add("öğrenci tablosu: " + (student != null ? "bulundu" : "YOK"));
-        Log.Add("işyeri tablosu: " + (company != null ? "bulundu" : "YOK"));
-        Log.Add("işveren tablosu: " + (employer != null ? "bulundu" : "YOK"));
-        Log.Add("onay tablosu: " + (approvals != null ? "bulundu" : "YOK"));     
-
+       
         return data;
     }
 
