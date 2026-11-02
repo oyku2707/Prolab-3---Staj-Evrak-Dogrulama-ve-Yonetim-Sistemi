@@ -1,10 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using StajSistemi.Data;
+using StajSistemi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<CsvImportService>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
