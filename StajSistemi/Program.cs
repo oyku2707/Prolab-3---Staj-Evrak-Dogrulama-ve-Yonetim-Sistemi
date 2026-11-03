@@ -1,5 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using StajSistemi.Data;
+using StajSistemi.Domain.Interfaces;
+using StajSistemi.Services;
+using StajSistemi.Validation.Rules;
+using StajSistemi.Services.Extractors;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +14,17 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
-});
+
+ });   
+    // Doğrulama kuralları 
+    builder.Services.AddScoped<IValidationRule, TcKimlikRule>();
+    builder.Services.AddScoped<IValidationRule, PhoneRule>();
+    builder.Services.AddScoped<IValidationRule, EmailRule>();
+    builder.Services.AddScoped<IValidationRule, EngineerCountRule>();
+    builder.Services.AddScoped<IValidationRule, FormVsDocumentRule>();
+    builder.Services.AddScoped<IDocumentFieldExtractor, DocxFieldExtractor>();
+    builder.Services.AddScoped<IValidationService, ValidationService>(); 
+
 
 var app = builder.Build();
 

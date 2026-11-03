@@ -5,5 +5,5 @@ namespace StajSistemi.Domain.Interfaces;
 public interface IValidationRule
 {
     string Name { get; }
-    ValidationResult Validate(ValidationContext context);
+    IEnumerable<ValidationResult> Validate(ValidationContext context);
 }
