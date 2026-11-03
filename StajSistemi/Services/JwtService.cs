@@ -20,17 +20,20 @@ namespace StajSistemi.Services
             var jwtSettings = _configuration.GetSection("Jwt");
             var keyBytes = Encoding.UTF8.GetBytes(jwtSettings["Key"] ?? throw new InvalidOperationException("JWT Key tanımlı değil!"));
 
-            // Token içerisine gömülecek kullanıcı bilgileri (Claims)
+            // Ekip sözleşmesine uygun Claim tipleri:
+            // 1. ClaimTypes.NameIdentifier -> GetUserId() metodunun okuduğu anahtar
+            // 2. ClaimTypes.Name -> Kullanıcı e-posta / adı
+            // 3. ClaimTypes.Role -> ROLE_ADMIN veya ROLE_STUDENT
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, userId),
-                new Claim(JwtRegisteredClaimNames.Email, email),
+                new Claim(ClaimTypes.NameIdentifier, userId),
+                new Claim(ClaimTypes.Name, email),
                 new Claim(ClaimTypes.Role, role),
                 new Claim("FullName", fullName),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-            var expiration = DateTime.UtcNow.AddHours(4); // Token 4 saat geçerli olacak
+            var expiration = DateTime.UtcNow.AddHours(4); // Token 4 saat geçerli
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {

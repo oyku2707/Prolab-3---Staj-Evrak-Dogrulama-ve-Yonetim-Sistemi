@@ -4,9 +4,10 @@ namespace StajSistemi.Extensions
 {
     public static class ClaimsPrincipalExtensions
     {
-        public static string? GetUserId(this ClaimsPrincipal user)
+        public static int GetUserId(this ClaimsPrincipal user)
         {
-            return user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var value = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return string.IsNullOrEmpty(value) ? 0 : int.Parse(value);
         }
     }
 }

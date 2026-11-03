@@ -4,6 +4,7 @@ using StajSistemi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<CsvImportService>();
