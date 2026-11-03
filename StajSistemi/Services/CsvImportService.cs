@@ -17,7 +17,6 @@ namespace StajSistemi.Services
 
         public void ImportStudents(string filePath)
         {
-            _context.Database.EnsureCreated();
 
             // Türkçe karakterlerin düzgün okunması için Encoding.UTF8 kullanıyoruz
             var lines = File.ReadAllLines(filePath, Encoding.UTF8).Skip(1);
