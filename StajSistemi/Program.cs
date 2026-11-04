@@ -29,7 +29,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 
 builder.Services.AddScoped<ICurrentUserService, FakeCurrentUserService>();
-builder.Services.AddScoped<IValidationService, FakeValidationService>();
 builder.Services.AddScoped<IDocumentStatusService, DocumentStatusService>();
 builder.Services.AddScoped<IFileStorage, FileStorage>();
 builder.Services.AddScoped<IDocumentService, DocumentService>();
