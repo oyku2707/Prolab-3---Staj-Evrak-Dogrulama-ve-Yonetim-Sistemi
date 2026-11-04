@@ -48,6 +48,7 @@ namespace StajSistemi.Services
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
+            tokenHandler.OutboundClaimTypeMap.Clear(); // DÜZELTME: claim tipleri kısaltılmasın (ClaimTypes.Role aynen kalsın)
             var securityToken = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(securityToken);
 

@@ -63,7 +63,13 @@ namespace StajSistemi.Controllers
             var jwtToken = handler.ReadJwtToken(result.TokenData.Token);
             var claims = jwtToken.Claims.ToList();
 
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            // DÜZELTME: isim ve rol claim tiplerini açıkça belirttik (IsInRole ve [Authorize(Roles=...)] çalışsın)
+            var claimsIdentity = new ClaimsIdentity(
+                claims,
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                ClaimTypes.Name,
+                ClaimTypes.Role);
+
             var authProperties = new AuthenticationProperties
             {
                 IsPersistent = true,
@@ -84,10 +90,19 @@ namespace StajSistemi.Controllers
         //Logout
         [HttpPost]
         [Authorize]
+        [ValidateAntiForgeryToken] // DÜZELTME: eklendi
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login");
+        }
+
+        //GET: /Auth/AccessDenied (403 döner, sayfa 3 sn sonra login'e yönlendirir)
+        [HttpGet]
+        public IActionResult AccessDenied()
+        {
+            Response.StatusCode = 403;
+            return View();
         }
     }
 }

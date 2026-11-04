@@ -60,7 +60,7 @@ namespace StajSistemi.Services
             // JWT üretimi
             var tokenData = _jwtService.GenerateToken(
                 userId: user.Id.ToString(),
-                email: user.Email,
+                email: user.UserName, // DÜZELTME: sözleşmede ClaimTypes.Name kullanıcı adıdır 
                 role: roleClaim,
                 fullName: user.UserName
             );
