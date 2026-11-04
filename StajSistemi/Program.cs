@@ -1,8 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using StajSistemi.Data;
-using StajSistemi.Services;
-using StajSistemi.Domain.Interfaces;
-using StajSistemi.Services.Documents;       
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +10,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
-    
 });
 
 builder.Services.AddScoped<ICurrentUserService, FakeCurrentUserService>();
