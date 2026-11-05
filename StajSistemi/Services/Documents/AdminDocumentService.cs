@@ -81,9 +81,11 @@ public class AdminDocumentService : IAdminDocumentService
         return new UploadResult { Success = true, DocumentId = document.Id };
     }
 
-    private void DeleteFileIfExists(string relativePath)
-    {
-        var fullPath = Path.Combine(_env.ContentRootPath, relativePath);
-        if (File.Exists(fullPath)) File.Delete(fullPath);
-    }
+    private void DeleteFileIfExists(string path)
+{
+    var fullPath = Path.IsPathRooted(path)
+        ? path
+        : Path.Combine(_env.ContentRootPath, path);
+    if (File.Exists(fullPath)) File.Delete(fullPath);
+}
 }

@@ -83,19 +83,30 @@ public class DocumentService : IDocumentService
     }
 
     // Yuklendi -> Inceleniyor -> doğrulama sonucu -> (Onaylandi ise) Tamamlandi
-    private async Task RunValidationAsync(Document document)
+private async Task RunValidationAsync(Document document)
+{
+    _status.Transition(document, DocumentStatus.Inceleniyor);
+    await _db.SaveChangesAsync();
+
+    DocumentStatus suggested;
+    try
     {
-        _status.Transition(document, DocumentStatus.Inceleniyor);
-        await _db.SaveChangesAsync();
-
-        var suggested = await _validation.ValidateAsync(document.Id);
-        _status.Transition(document, suggested);
-
-        if (document.Status == DocumentStatus.Onaylandi)
-            _status.Transition(document, DocumentStatus.Tamamlandi);
-
-        await _db.SaveChangesAsync();
+        suggested = await _validation.ValidateAsync(document.Id);
     }
+    catch (Exception)
+    {
+        // Doğrulama çökerse belge İnceleniyor'da takılmasın: HataliEksik'e düş,
+        // öğrenci yeniden yükleyebilsin.
+        suggested = DocumentStatus.HataliEksik;
+    }
+
+    _status.Transition(document, suggested);
+
+    if (document.Status == DocumentStatus.Onaylandi)
+        _status.Transition(document, DocumentStatus.Tamamlandi);
+
+    await _db.SaveChangesAsync();
+}
 
     private static string? CheckFile(IFormFile? file)
     {

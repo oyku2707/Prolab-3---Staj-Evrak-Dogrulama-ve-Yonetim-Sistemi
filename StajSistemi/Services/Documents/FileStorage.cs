@@ -22,6 +22,7 @@ public class FileStorage : IFileStorage
         using var stream = new FileStream(fullPath, FileMode.Create);
         await file.CopyToAsync(stream);
 
-        return Path.Combine("Uploads", fileName);
+        // Tam yol döner: doğrulama servisi Document.FilePath ile dosyayı doğrudan açabilir.
+        return fullPath;
     }
 }
