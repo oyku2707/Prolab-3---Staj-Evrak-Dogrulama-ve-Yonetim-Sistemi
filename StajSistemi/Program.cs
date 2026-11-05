@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using StajSistemi.Data;
 using StajSistemi.Services;
+using StajSistemi.Services.Dataset;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +12,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<JwtService>();
-builder.Services.AddScoped<CsvImportService>();
+builder.Services.AddScoped<IDatasetReader, CsvDatasetReader>();
+builder.Services.AddScoped<DatasetImportService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -47,6 +49,13 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["Cache-Control"] = "no-store, no-cache, must-revalidate";
+    context.Response.Headers["Pragma"] = "no-cache";
+    await next();
+});
 
 app.MapStaticAssets();
 
