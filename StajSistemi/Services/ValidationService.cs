@@ -41,7 +41,8 @@ public class ValidationService : IValidationService
 
         if (document is null)
             throw new ArgumentException($"Belge bulunamadı (Id: {documentId}).");
-
+       
+        document.ExtractedData = null;
         var results = new List<ValidationResult>();
 
         var extension = Path.GetExtension(document.FilePath);
