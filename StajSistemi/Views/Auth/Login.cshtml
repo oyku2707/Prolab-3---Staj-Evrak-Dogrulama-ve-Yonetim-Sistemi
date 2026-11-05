@@ -6,6 +6,11 @@
     <div class="col-md-5">
         <h2 class="mb-4">Giriş Yap</h2>
 
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">@TempData["Success"]</div>
+        }
+
         <form asp-controller="Auth" asp-action="Login" method="post">
             <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
@@ -20,6 +25,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary">Giriş Yap</button>
+            <a asp-action="Register" class="btn btn-link">Kayıt ol</a>
         </form>
     </div>
 </div>

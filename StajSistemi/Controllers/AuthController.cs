@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StajSistemi.DTOs;
+using StajSistemi.Models;
 using StajSistemi.Services;
 using System.Security.Claims;
 
@@ -85,6 +86,50 @@ namespace StajSistemi.Controllers
             }
 
             return RedirectToAction("Index", "Student");
+        }
+
+        // GET: /Auth/Register
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View(new RegisterViewModel());
+        }
+
+        // POST: /Auth/Register
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(RegisterViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var result = await _authService.RegisterAsync(model.UserName, model.Email, model.StudentNo, model.Password);
+
+            switch (result.Status)
+            {
+                case RegisterStatus.UserNameTaken:
+                    ModelState.AddModelError(nameof(model.UserName), "Bu kullanıcı adı zaten kullanılıyor.");
+                    return View(model);
+
+                case RegisterStatus.EmailTaken:
+                    ModelState.AddModelError(nameof(model.Email), "Bu e-posta zaten kullanılıyor.");
+                    return View(model);
+
+                case RegisterStatus.StudentNoAlreadyLinked:
+                    ModelState.AddModelError(nameof(model.StudentNo), "Bu öğrenci numarası başka bir hesapla kayıtlı.");
+                    return View(model);
+            }
+
+            if (result.ProfileLinked)
+            {
+                TempData["Success"] = "Kayıt başarılı. Öğrenci bilgileriniz hesabınıza bağlandı, giriş yapabilirsiniz.";
+            }
+            else
+            {
+                TempData["Success"] = "Kayıt başarılı. Öğrenci numaranız veri setinde bulunamadı, giriş yapabilirsiniz.";
+            }
+
+            return RedirectToAction("Login");
         }
 
         //Logout
