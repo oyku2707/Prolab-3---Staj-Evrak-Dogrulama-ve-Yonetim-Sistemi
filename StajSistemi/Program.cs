@@ -24,6 +24,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     builder.Services.AddScoped<IValidationRule, FormVsDocumentRule>();
     builder.Services.AddScoped<IDocumentFieldExtractor, DocxFieldExtractor>();
     builder.Services.AddScoped<IValidationService, ValidationService>(); 
+    builder.Services.AddScoped<IValidationRule, ProfileMatchRule>();
 
 
 var app = builder.Build();
