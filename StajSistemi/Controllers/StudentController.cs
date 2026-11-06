@@ -6,7 +6,6 @@ using StajSistemi.Services;
 
 namespace StajSistemi.Controllers;
 
-// TODO: Kişi 1'in girişi gelince [Authorize(Roles = "ROLE_STUDENT")] eklenecek.
 public class StudentController : Controller
 {
     private readonly AppDbContext _db;

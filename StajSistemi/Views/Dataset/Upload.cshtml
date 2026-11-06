@@ -1,0 +1,42 @@
+﻿@model StajSistemi.DTOs.DatasetImportResult?
+@{
+    ViewData["Title"] = "Veri Seti Yükle";
+}
+
+<h2 class="mb-3">Veri Seti Yükle</h2>
+<p>Kabul edilen dosya türü: <strong>.csv</strong> (UTF-8). Veri seti yalnızca öğrenci profillerini oluşturur, hesap açmaz.</p>
+
+<form asp-controller="Dataset" asp-action="Upload" method="post" enctype="multipart/form-data" class="mb-4">
+    <div asp-validation-summary="All" class="text-danger mb-2"></div>
+    <input type="file" name="file" accept=".csv" class="form-control mb-3" />
+    <button type="submit" class="btn btn-primary">Yükle</button>
+</form>
+
+@if (Model != null)
+{
+    if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <div class="alert alert-danger">@Model.Error</div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <strong>@Model.Added</strong> satır eklendi,
+            <strong>@Model.Updated</strong> satır güncellendi,
+            <strong>@Model.Rejected.Count</strong> satır reddedildi.
+        </div>
+
+        @if (Model.Rejected.Count > 0)
+        {
+            <table class="table table-sm table-bordered">
+                <thead><tr><th>Satır</th><th>Neden</th></tr></thead>
+                <tbody>
+                    @foreach (var r in Model.Rejected)
+                    {
+                        <tr><td>@r.LineNumber</td><td>@r.Reason</td></tr>
+                    }
+                </tbody>
+            </table>
+        }
+    }
+}
