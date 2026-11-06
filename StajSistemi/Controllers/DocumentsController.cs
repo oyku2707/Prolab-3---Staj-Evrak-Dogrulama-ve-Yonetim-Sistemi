@@ -6,10 +6,11 @@ using StajSistemi.Domain.Enums;
 using StajSistemi.Models;
 using StajSistemi.Services;
 using StajSistemi.Services.Documents;
+using Microsoft.AspNetCore.Authorization;
 
 namespace StajSistemi.Controllers;
 
-// TODO: Kişi 1'in girişi gelince [Authorize] eklenecek.
+[Authorize(Roles = "ROLE_STUDENT,ROLE_ADMIN")]
 public class DocumentsController : Controller
 {
     private static readonly string[] ValidDays =

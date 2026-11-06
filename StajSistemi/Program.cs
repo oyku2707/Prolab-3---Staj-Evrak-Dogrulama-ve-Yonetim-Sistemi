@@ -9,6 +9,7 @@ using StajSistemi.Services.Extractors;
 using StajSistemi.Services.Documents;
 
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -47,7 +48,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     builder.Services.AddScoped<IValidationService, ValidationService>();
 
 
-builder.Services.AddScoped<ICurrentUserService, FakeCurrentUserService>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, ClaimsCurrentUserService>();
 builder.Services.AddScoped<IDocumentStatusService, DocumentStatusService>();
 builder.Services.AddScoped<IFileStorage, FileStorage>();
 builder.Services.AddScoped<IDocumentService, DocumentService>();

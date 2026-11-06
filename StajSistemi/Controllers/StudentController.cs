@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StajSistemi.Data;
@@ -6,6 +7,7 @@ using StajSistemi.Services;
 
 namespace StajSistemi.Controllers;
 
+[Authorize(Roles = "ROLE_STUDENT")]
 public class StudentController : Controller
 {
     private readonly AppDbContext _db;

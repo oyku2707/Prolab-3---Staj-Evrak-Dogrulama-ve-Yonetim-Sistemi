@@ -25,10 +25,10 @@
                         @if (CurrentUser.UserId == null)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" href="/Account/Login">Giriş</a>
+                                <a class="nav-link text-dark" href="/Auth/Login">Giriş</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" href="/Account/Register">Kayıt Ol</a>
+                                <a class="nav-link text-dark" href="/Auth/Register">Kayıt Ol</a>
                             </li>
                         }
                         else if (CurrentUser.IsAdmin)
@@ -55,8 +55,10 @@
                     </ul>
                     @if (CurrentUser.UserId != null)
                     {
-                        <span class="navbar-text me-3">@(CurrentUser.IsAdmin ? "Admin" : "Öğrenci")</span>
-                        <a class="nav-link text-dark" href="/Account/Logout">Çıkış</a>
+                        <span class="navbar-text me-3">@User.Identity?.Name (@(CurrentUser.IsAdmin ? "Admin" : "Öğrenci"))</span>
+                        <form asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-outline-secondary btn-sm">Çıkış</button>
+                        </form>
                     }
                 </div>
             </div>

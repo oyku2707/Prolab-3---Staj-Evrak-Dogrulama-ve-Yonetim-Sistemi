@@ -6,9 +6,11 @@ using StajSistemi.Domain.Enums;
 using StajSistemi.Models;
 using StajSistemi.Services;
 using StajSistemi.Services.Documents;
+using Microsoft.AspNetCore.Authorization;
 
 namespace StajSistemi.Controllers;
 
+[Authorize(Roles = "ROLE_ADMIN")]
 public class AdminController : Controller
 {
     private const int PageSize = 10;
