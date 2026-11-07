@@ -1,0 +1,41 @@
+@using StajSistemi.Helpers
+@model List<StajSistemi.Models.DocumentRowViewModel>
+@{
+    ViewData["Title"] = "Belgelerim";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Belgelerim</h2>
+    <a class="btn btn-primary" asp-controller="Documents" asp-action="Upload">Evrak Yükle</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Henüz belge yüklemediniz.</div>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Yükleme tarihi</th>
+                <th>Biçim</th>
+                <th>Statü</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var d in Model)
+            {
+                <tr>
+                    <td>@d.UploadedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>@d.FileType</td>
+                    <td><span class="badge @StatusDisplay.BadgeClass(d.Status)">@StatusDisplay.Label(d.Status)</span></td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-secondary" asp-controller="Documents" asp-action="Report" asp-route-id="@d.Id">Rapor</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

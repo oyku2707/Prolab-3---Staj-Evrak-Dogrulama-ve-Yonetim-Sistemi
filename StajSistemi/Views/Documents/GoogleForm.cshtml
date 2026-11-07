@@ -1,0 +1,45 @@
+@model StajSistemi.Models.GoogleFormViewModel
+@{
+    ViewData["Title"] = "Google Form";
+}
+
+<h2>Staj Evrağı Teslim Google Form Bağlantısı</h2>
+
+@if (Model.Valid)
+{
+    <div class="alert alert-success">Bağlantı geçerli.</div>
+}
+
+<form asp-action="GoogleForm" method="post">
+    <input type="hidden" asp-for="DocumentId" />
+    <div class="mb-3">
+        <label asp-for="Url" class="form-label">Google Form URL</label>
+        <input asp-for="Url" class="form-control" placeholder="https://docs.google.com/forms/..." />
+    </div>
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+    <a class="btn btn-outline-secondary" asp-action="Report" asp-route-id="@Model.DocumentId">Rapora dön</a>
+</form>
+
+<div class="modal fade" id="urlModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Uyarı</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">@Model.Error</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tamam</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <script>
+            new bootstrap.Modal(document.getElementById('urlModal')).show();
+        </script>
+    }
+}

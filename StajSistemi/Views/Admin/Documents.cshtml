@@ -1,0 +1,98 @@
+@using StajSistemi.Helpers
+@using StajSistemi.Domain.Enums
+@model StajSistemi.Models.AdminListViewModel
+@{
+    var pageAction = Model.OnlyCompleted ? "Completed" : "Documents";
+    ViewData["Title"] = Model.OnlyCompleted ? "Tamamlananlar" : "Başvurular";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>@ViewData["Title"]</h2>
+    @if (Model.OnlyCompleted)
+    {
+        <button class="btn btn-outline-secondary" disabled title="Final aşamasında">Ek-17 oluştur (final)</button>
+    }
+</div>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-info">@TempData["Message"]</div>
+}
+
+<form method="get" asp-action="@pageAction" class="row g-2 mb-3">
+    @if (!Model.OnlyCompleted)
+    {
+        <div class="col-md-2">
+            <select name="status" class="form-select">
+                <option value="">Tüm statüler</option>
+                @foreach (var s in Enum.GetValues<DocumentStatus>())
+                {
+                    <option value="@s" selected="@(Model.Status == s)">@StatusDisplay.Label(s)</option>
+                }
+            </select>
+        </div>
+    }
+    <div class="col-md-3">
+        <input name="q" value="@Model.Q" class="form-control" placeholder="Öğrenci no veya ad" />
+    </div>
+    <div class="col-md-2">
+        <input type="date" name="dateFrom" value="@Model.DateFrom?.ToString("yyyy-MM-dd")" class="form-control" />
+    </div>
+    <div class="col-md-2">
+        <input type="date" name="dateTo" value="@Model.DateTo?.ToString("yyyy-MM-dd")" class="form-control" />
+    </div>
+    <div class="col-md-3">
+        <button class="btn btn-primary" type="submit">Filtrele</button>
+        <a class="btn btn-outline-secondary" asp-action="@pageAction">Temizle</a>
+    </div>
+</form>
+
+@if (!Model.Rows.Any())
+{
+    <div class="alert alert-info">Kayıt bulunamadı.</div>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Öğrenci no</th>
+                <th>Ad Soyad</th>
+                <th>Biçim</th>
+                <th>Statü</th>
+                <th>Yükleme tarihi</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in Model.Rows)
+            {
+                <tr>
+                    <td>@r.StudentNo</td>
+                    <td>@r.StudentName</td>
+                    <td>@r.FileType</td>
+                    <td><span class="badge @StatusDisplay.BadgeClass(r.Status)">@StatusDisplay.Label(r.Status)</span></td>
+                    <td>@r.UploadedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                    <td><a class="btn btn-sm btn-outline-primary" asp-action="Details" asp-route-id="@r.Id">İncele</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (Model.TotalPages > 1)
+    {
+        <nav>
+            <ul class="pagination">
+                @for (var i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.Page ? "active" : "")">
+                        <a class="page-link" asp-action="@pageAction" asp-route-page="@i"
+                           asp-route-status="@Model.Status" asp-route-q="@Model.Q"
+                           asp-route-dateFrom="@Model.DateFrom?.ToString("yyyy-MM-dd")"
+                           asp-route-dateTo="@Model.DateTo?.ToString("yyyy-MM-dd")">@i</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+}

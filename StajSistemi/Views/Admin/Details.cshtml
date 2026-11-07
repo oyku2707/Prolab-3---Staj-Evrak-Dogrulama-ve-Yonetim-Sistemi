@@ -1,0 +1,116 @@
+@using StajSistemi.Helpers
+@model StajSistemi.Models.AdminDetailsViewModel
+@{
+    ViewData["Title"] = "Belge Detayı";
+}
+
+<h2>Belge Detayı</h2>
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success">@TempData["Message"]</div>
+}
+
+<div class="card mb-3">
+    <div class="card-body row">
+        <div class="col-md-4"><strong>Biçim:</strong> @Model.FileType</div>
+        <div class="col-md-4"><strong>Yükleme tarihi:</strong> @Model.UploadedAt.ToString("dd.MM.yyyy HH:mm")</div>
+        <div class="col-md-4">
+            <strong>Statü:</strong>
+            <span class="badge @StatusDisplay.BadgeClass(Model.Status)">@StatusDisplay.Label(Model.Status)</span>
+        </div>
+    </div>
+</div>
+
+<h5>Bilgi karşılaştırması</h5>
+<table class="table table-bordered align-middle">
+    <thead>
+        <tr><th>Alan</th><th>Formda girilen</th><th>Belgeden okunan</th><th>Veri setindeki</th></tr>
+    </thead>
+    <tbody>
+        @foreach (var r in Model.Rows)
+        {
+            <tr class="@(r.Mismatch ? "table-danger" : "")">
+                <td><strong>@r.Label</strong></td>
+                <td>@r.Entered</td>
+                <td>@r.Extracted</td>
+                <td>@r.Dataset</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (Model.DatasetResults.Any())
+{
+    <div class="alert alert-danger">
+        <h5>Veri seti karşılaştırma sonuçları</h5>
+        <ul class="mb-0">
+            @foreach (var d in Model.DatasetResults)
+            {
+                <li><strong>@d.FieldName:</strong> @d.Message</li>
+            }
+        </ul>
+    </div>
+}
+
+@if (Model.Errors.Any())
+{
+    <div class="alert alert-danger">
+        <h5>Hatalar</h5>
+        <ul class="mb-0">
+            @foreach (var e in Model.Errors)
+            {
+                <li><strong>@e.FieldName:</strong> @e.Message
+                    @if (!string.IsNullOrEmpty(e.Suggestion)) { <br /><small>Öneri: @e.Suggestion</small> }
+                </li>
+            }
+        </ul>
+    </div>
+}
+
+@if (Model.Warnings.Any())
+{
+    <div class="alert alert-warning">
+        <h5>Uyarılar</h5>
+        <ul class="mb-0">
+            @foreach (var w in Model.Warnings)
+            {
+                <li><strong>@w.FieldName:</strong> @w.Message</li>
+            }
+        </ul>
+    </div>
+}
+
+@if (Model.Passed.Any())
+{
+    <details class="mb-3">
+        <summary class="text-success">Geçen kontroller (@Model.Passed.Count)</summary>
+        <ul class="mt-2">
+            @foreach (var p in Model.Passed)
+            {
+                <li class="text-success">@p.FieldName: @p.Message</li>
+            }
+        </ul>
+    </details>
+}
+
+<a class="btn btn-outline-secondary" asp-action="Documents">Listeye dön</a>
+<a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model.DocumentId">Düzenle</a>
+<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Sil</button>
+
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Belgeyi sil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">Bu belge ve doğrulama sonuçları kalıcı olarak silinecek. Emin misiniz?</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                <form asp-action="Delete" asp-route-id="@Model.DocumentId" method="post">
+                    <button type="submit" class="btn btn-danger">Evet, sil</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
