@@ -1,4 +1,4 @@
-# Durum diyagramı
+# Belge statü diyagramı
 
 ```mermaid
 stateDiagram-v2
@@ -13,4 +13,4 @@ stateDiagram-v2
         Öğrenci değiştiremez ve silemez.
         Güncelleme ve silme sadece admin sayfasından.
     end note
-    ```
+```
