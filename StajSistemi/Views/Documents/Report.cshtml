@@ -65,7 +65,13 @@
         <ul class="mt-2">
             @foreach (var p in Model.Passed)
             {
-                <li class="text-success">@p.FieldName: @p.Message</li>
+                <li class="text-success">
+                    <strong>@p.RuleName</strong> <small class="text-muted">(@p.FieldName)</small>
+                    @if (!string.IsNullOrWhiteSpace(p.Message))
+                    {
+                        <span>: @p.Message</span>
+                    }
+                </li>
             }
         </ul>
     </details>
@@ -78,7 +84,8 @@
 else if (Model.Status == DocumentStatus.Tamamlandi)
 {
     <div class="alert alert-secondary">Bu belge tamamlandı, değiştirilemez.</div>
-    
-}<a class="btn btn-outline-primary" asp-action="InternshipDays" asp-route-id="@Model.DocumentId">Staj günlerini seç</a>
+}
+
+<a class="btn btn-outline-primary" asp-action="InternshipDays" asp-route-id="@Model.DocumentId">Staj günlerini seç</a>
 <a class="btn btn-outline-primary" asp-action="GoogleForm" asp-route-id="@Model.DocumentId">Google Form URL gir</a>
 <a class="btn btn-outline-secondary" asp-controller="Student" asp-action="Index">Belgelerime dön</a>
