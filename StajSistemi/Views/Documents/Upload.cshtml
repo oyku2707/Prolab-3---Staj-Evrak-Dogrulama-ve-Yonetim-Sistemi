@@ -65,7 +65,7 @@
             </div>
             <div class="col-md-3">
                 <label asp-for="Entered.PreviousInternshipDays" class="form-label">Önceki staj günü</label>
-                <input asp-for="Entered.PreviousInternshipDays" type="number" class="form-control" />
+                <input asp-for="Entered.PreviousInternshipDays" type="number" min="0"" class="form-control" />
             </div>
             <div class="col-md-3">
                 <label asp-for="Entered.AcademicYear" class="form-label">Eğitim yılı</label>
@@ -117,11 +117,11 @@
             </div>
             <div class="col-md-3">
                 <label asp-for="Entered.EngineerCount" class="form-label">Mühendis sayısı</label>
-                <input asp-for="Entered.EngineerCount" type="number" class="form-control" />
+                <input asp-for="Entered.EngineerCount" type="number" min="0"" class="form-control" />
             </div>
             <div class="col-md-3">
                 <label asp-for="Entered.EmployeeCount" class="form-label">Çalışan sayısı</label>
-                <input asp-for="Entered.EmployeeCount" type="number" class="form-control" />
+                <input asp-for="Entered.EmployeeCount" type="number" min="0"" class="form-control" />
             </div>
             <div class="col-md-6">
                 <label asp-for="Entered.CompanyAddress" class="form-label">Adres</label>
@@ -137,7 +137,7 @@
             </div>
             <div class="col-md-3">
                 <label asp-for="Entered.InternshipDays" class="form-label">Staj günü</label>
-                <input asp-for="Entered.InternshipDays" type="number" class="form-control" />
+                <input asp-for="Entered.InternshipDays" type="number" min="0"" class="form-control" />
             </div>
             <div class="col-md-3">
                 <label asp-for="Entered.IsAbroad" class="form-label">Yurt dışında mı?</label>

@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using StajSistemi.Data;
 using StajSistemi.Domain.Entities;
+using StajSistemi.Services.Documents;
+
 
 namespace StajSistemi.Services.Documents;
 
@@ -46,6 +48,10 @@ public class AdminDocumentService : IAdminDocumentService
         if (document == null)
             return new UploadResult { Success = false, Error = "Belge bulunamadı." };
 
+        var entryError = EntryChecks.Validate(entered);
+        if (entryError != null)
+            return new UploadResult { Success = false, Error = entryError };
+
         // Dosya zorunlu değil; seçildiyse format kontrolü yapılır.
         string? newPath = null;
         string? newType = null;
@@ -82,10 +88,10 @@ public class AdminDocumentService : IAdminDocumentService
     }
 
     private void DeleteFileIfExists(string path)
-{
-    var fullPath = Path.IsPathRooted(path)
-        ? path
-        : Path.Combine(_env.ContentRootPath, path);
-    if (File.Exists(fullPath)) File.Delete(fullPath);
-}
+    {
+        var fullPath = Path.IsPathRooted(path)
+            ? path
+            : Path.Combine(_env.ContentRootPath, path);
+        if (File.Exists(fullPath)) File.Delete(fullPath);
+    }
 }

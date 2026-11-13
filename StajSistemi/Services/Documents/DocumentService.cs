@@ -3,6 +3,7 @@ using StajSistemi.Data;
 using StajSistemi.Domain.Entities;
 using StajSistemi.Domain.Enums;
 using StajSistemi.Domain.Interfaces;
+using StajSistemi.Services.Documents;
 
 namespace StajSistemi.Services.Documents;
 
@@ -29,7 +30,7 @@ public class DocumentService : IDocumentService
 
     public async Task<UploadResult> UploadAsync(int studentId, IFormFile? file, Ek16Data entered)
     {
-        var error = CheckFile(file);
+        var error = CheckFile(file) ?? EntryChecks.Validate(entered);
         if (error != null) return Fail(error);
 
         var path = await _storage.SaveAsync(file!);
@@ -66,7 +67,7 @@ public class DocumentService : IDocumentService
         if (document.Status != DocumentStatus.HataliEksik)
             return Fail("Sadece Hatalı / Eksik belgeler yeniden yüklenebilir.");
 
-        var error = CheckFile(file);
+        var error = CheckFile(file) ?? EntryChecks.Validate(entered);
         if (error != null) return Fail(error);
 
         _db.ValidationResults.RemoveRange(document.Results);
@@ -83,30 +84,30 @@ public class DocumentService : IDocumentService
     }
 
     // Yuklendi -> Inceleniyor -> doğrulama sonucu -> (Onaylandi ise) Tamamlandi
-private async Task RunValidationAsync(Document document)
-{
-    _status.Transition(document, DocumentStatus.Inceleniyor);
-    await _db.SaveChangesAsync();
-
-    DocumentStatus suggested;
-    try
+    private async Task RunValidationAsync(Document document)
     {
-        suggested = await _validation.ValidateAsync(document.Id);
+        _status.Transition(document, DocumentStatus.Inceleniyor);
+        await _db.SaveChangesAsync();
+
+        DocumentStatus suggested;
+        try
+        {
+            suggested = await _validation.ValidateAsync(document.Id);
+        }
+        catch (Exception)
+        {
+            // Doğrulama çökerse belge İnceleniyor'da takılmasın: HataliEksik'e düş,
+            // öğrenci yeniden yükleyebilsin.
+            suggested = DocumentStatus.HataliEksik;
+        }
+
+        _status.Transition(document, suggested);
+
+        if (document.Status == DocumentStatus.Onaylandi)
+            _status.Transition(document, DocumentStatus.Tamamlandi);
+
+        await _db.SaveChangesAsync();
     }
-    catch (Exception)
-    {
-        // Doğrulama çökerse belge İnceleniyor'da takılmasın: HataliEksik'e düş,
-        // öğrenci yeniden yükleyebilsin.
-        suggested = DocumentStatus.HataliEksik;
-    }
-
-    _status.Transition(document, suggested);
-
-    if (document.Status == DocumentStatus.Onaylandi)
-        _status.Transition(document, DocumentStatus.Tamamlandi);
-
-    await _db.SaveChangesAsync();
-}
 
     private static string? CheckFile(IFormFile? file)
     {

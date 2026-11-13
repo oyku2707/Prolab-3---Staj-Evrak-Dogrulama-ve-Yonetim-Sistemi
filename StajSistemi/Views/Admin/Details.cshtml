@@ -5,6 +5,7 @@
 }
 
 <h2>Belge Detayı</h2>
+
 @if (TempData["Message"] != null)
 {
     <div class="alert alert-success">@TempData["Message"]</div>
@@ -87,7 +88,13 @@
         <ul class="mt-2">
             @foreach (var p in Model.Passed)
             {
-                <li class="text-success">@p.FieldName: @p.Message</li>
+                <li class="text-success">
+                    <strong>@p.RuleName</strong> <small class="text-muted">(@p.FieldName)</small>
+                    @if (!string.IsNullOrWhiteSpace(p.Message))
+                    {
+                        <span>: @p.Message</span>
+                    }
+                </li>
             }
         </ul>
     </details>
