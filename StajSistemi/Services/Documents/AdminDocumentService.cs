@@ -3,6 +3,7 @@ using StajSistemi.Data;
 using StajSistemi.Domain.Entities;
 using StajSistemi.Services.Documents;
 
+
 namespace StajSistemi.Services.Documents;
 
 // Admin istisnası: Tamamlandı dahil düzenleyebilir ve silebilir. Sadece AdminController çağırır.
