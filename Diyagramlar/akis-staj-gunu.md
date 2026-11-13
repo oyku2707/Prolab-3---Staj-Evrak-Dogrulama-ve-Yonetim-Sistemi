@@ -1,5 +1,7 @@
 # Staj günü hesabı akışı
 
+> Durum: Staj günü ekranı şu an yalnızca seçimi `InternshipDaySelections` tablosuna kaydeder (`WeekDays`, `RangeStart`, `RangeEnd`). Aşağıdaki hesap ve karşılaştırma (`CalculatedDays`) final aşamasında yazılacak kural için tasarlanmış akıştır.
+
 ```mermaid
 flowchart TD
     A(["Başla"]) --> B["Seçilen haftalık günleri ve tarih aralığını al"]
@@ -18,4 +20,4 @@ flowchart TD
     I -->|"hayır"| K["Sonuç: uyuşmazlık, raporda göster"]
     J --> L(["Bitiş"])
     K --> L
-    ```
+```
