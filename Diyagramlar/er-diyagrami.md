@@ -1,11 +1,13 @@
 # Veri Tabanı (ER) Diyagramı
 
+Tablolar `AppDbContext` ve migration dosyalarından çıkarılmıştır. `Student` ve `Admin` aynı `Users` tablosunda tutulur (TPH, `Discriminator` sütunu). `Ek16Data` ayrı tablo değildir: `Documents` tablosuna `ExtractedData_` ve `EnteredData_` önekli sütunlar olarak gömülüdür.
+
 ```mermaid
 erDiagram
-    Users ||--o| StudentProfiles : "StudentId"
+    Users |o--o| StudentProfiles : "StudentId (bos olabilir)"
     Users ||--o{ Documents : "StudentId"
     Documents ||--o{ ValidationResults : "DocumentId"
-    Documents ||--o{ InternshipDaySelections : "DocumentId"
+    Documents ||--o{ InternshipDaySelections : "DocumentId (FK kisiti yok)"
 
     Users {
         int Id PK
@@ -14,11 +16,11 @@ erDiagram
         string PasswordHash
         int FailedLoginCount
         bool IsLocked
-        string Discriminator
+        string Discriminator "Student veya Admin"
     }
     StudentProfiles {
         int Id PK
-        int StudentId FK
+        int StudentId FK "null olabilir"
         string FullName
         string TcNo
         string StudentNo
@@ -39,7 +41,8 @@ erDiagram
         string FileType
         datetime UploadedAt
         string Status
-        string ExtractedData_Ek16_alanlari
+        string ExtractedData_Ek16_alanlari "belgeden okunan, 35 sutun"
+        string EnteredData_Ek16_alanlari "formdan girilen, 35 sutun"
     }
     ValidationResults {
         int Id PK
@@ -72,3 +75,5 @@ erDiagram
         string Name
     }
 ```
+
+`LoginAttempts` ve `Holidays` diğer tablolara bağlı değildir. `Holidays` tablosunu staj günü kuralı (final) dolduracaktır. EF Core'un kendi tablosu `__EFMigrationsHistory` diyagrama alınmamıştır.
