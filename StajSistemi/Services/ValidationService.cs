@@ -3,6 +3,7 @@ using StajSistemi.Data;
 using StajSistemi.Domain.Entities;
 using StajSistemi.Domain.Enums;
 using StajSistemi.Domain.Interfaces;
+using Microsoft.Extensions.Logging;
 using StajSistemi.Validation;
 
 namespace StajSistemi.Services;
@@ -12,15 +13,18 @@ public class ValidationService : IValidationService
     private readonly IEnumerable<IValidationRule> _rules;
     private readonly IEnumerable<IDocumentFieldExtractor> _extractors;
     private readonly AppDbContext _db;
+    private readonly ILogger<ValidationService> _logger;
 
     public ValidationService(
         IEnumerable<IValidationRule> rules,
         IEnumerable<IDocumentFieldExtractor> extractors,
-        AppDbContext db)
+        AppDbContext db,
+        ILogger<ValidationService> logger)
     {
         _rules = rules;
         _extractors = extractors;
         _db = db;
+        _logger = logger;
     }
 
     public List<ValidationResult> RunRules(ValidationContext context)
@@ -50,7 +54,7 @@ public class ValidationService : IValidationService
 
         if (extractor is null)
         {
-            results.Add(ReadFailure("Bu dosya biçimi vizede otomatik okunamıyor (şimdilik sadece .docx desteklenir)."));
+            results.Add(ReadFailure("Bu dosya biçimi otomatik okunamıyor."));
         }
         else
         {
@@ -58,8 +62,10 @@ public class ValidationService : IValidationService
             {
                 document.ExtractedData = extractor.Extract(document.FilePath);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                // Sebebi terminalde görünsün (bozuk dosya, LibreOffice yok, şablon farklı vb.).
+                _logger.LogWarning(ex, "Belge okunamadı. Belge Id: {DocumentId}, dosya: {File}", documentId, document.FilePath);
                 results.Add(ReadFailure("Belge okunamadı, dosya bozuk ya da beklenen biçimde olmayabilir."));
             }
         }
