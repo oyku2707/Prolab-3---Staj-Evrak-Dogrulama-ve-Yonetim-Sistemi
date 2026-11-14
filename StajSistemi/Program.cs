@@ -49,6 +49,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     builder.Services.AddScoped<IValidationRule, ProfileMatchRule>();
     builder.Services.AddScoped<IDocumentFieldExtractor, DocFieldExtractor>();
     builder.Services.AddScoped<IDocumentFieldExtractor, DocxFieldExtractor>();
+    builder.Services.AddScoped<IDocumentFieldExtractor, PdfFieldExtractor>();
     builder.Services.AddScoped<IValidationService, ValidationService>();
 
 
