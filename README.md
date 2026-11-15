@@ -1,4 +1,4 @@
-# Prolab-3---Staj-Evrak-Do-rulama-ve-Y-netim-Sistemi# Staj Evrak Doğrulama ve Yönetim Sistemi
+# Staj Evrak Doğrulama ve Yönetim Sistemi
 
 Programlama Laboratuvarı III, 2026-2027 Güz, Yazılım Mühendisliği.
 
@@ -16,6 +16,7 @@ Sistem yalnızca Ek-16'yı işler. Google Form'a otomatik kayıt, Ek-17 üretimi
 | BCrypt.Net-Next | Şifre hash'leme |
 | JWT + cookie kimlik doğrulama | Oturum ve rol taşıma |
 | DocumentFormat.OpenXml | .docx okuma |
+| LibreOffice (isteğe bağlı) | .doc dosyasını .docx'e çevirmek için |
 | Bootstrap | Arayüz |
 
 EF Core ve Pomelo paketleri `9.0.0` sürümüne sabittir, yükseltmeyin (paket sürüm çakışması çıkar). Proje yine .NET 10 üzerinde çalışır.
@@ -130,7 +131,7 @@ Geçişler `DocumentStatusService` içinde tek yerde denetlenir, geçersiz geçi
 | Form ve belge karşılaştırma | Formdaki bilgi ile belgeden okunan bilgi |
 | Veri seti karşılaştırma | Belgedeki bilgi ile veri setindeki resmi kayıt (uyarı düzeyinde, admin detayında ayrı gösterilir, öğrenci raporunda gizlidir) |
 
-Yükleme sırasında dosya biçimi (`.doc`, `.docx`, PDF, JPEG, PNG), boş dosya ve 10 MB sınırı kontrol edilir. Vizede yalnızca `.docx` otomatik okunur, diğer biçimler yüklenir ancak raporda "okunamıyor" hatası görünür.
+Yükleme sırasında dosya biçimi (`.doc`, `.docx`, PDF, JPEG, PNG), boş dosya ve 10 MB sınırı kontrol edilir. `.docx` doğrudan, `.doc` LibreOffice ile çevrilerek okunur. PDF, JPEG ve PNG yüklenir ancak raporda "okunamıyor" hatası görünür.
 
 ## Proje yapısı
 
@@ -181,7 +182,7 @@ GitHub bu dosyaları açınca diyagramları çizilmiş olarak gösterir.
 
 - Staj günü ekranı seçimi kaydeder, `CalculatedDays` hesaplanmaz ve gün sayısı kuralı yoktur (final).
 - Google Form URL yalnızca doğrulanır, kaydedilmez. Form'a otomatik kayıt ve Ek-17 üretimi finale kalmıştır, Ek-17 butonu pasiftir.
-- Otomatik okuma yalnızca `.docx` için çalışır, OCR finalde eklenecektir.
+- Otomatik okuma `.docx` için doğrudan, `.doc` için LibreOffice ile `.docx`'e çevrilerek çalışır (LibreOffice kurulu olmalı, yoksa raporda "belge okunamadı" görünür). PDF, JPEG ve PNG için OCR finalde eklenecektir.
 - Admin düzenlemesi doğrulamayı yeniden çalıştırmaz ve statüyü değiştirmez.
 - Doğrulama çökerse belge İnceleniyor'da takılmasın diye Hatalı/Eksik'e düşer, sebep rapora yazılmaz.
 - Çıkışta cookie silinir, JWT sunucuda ayrıca iptal edilmez.
