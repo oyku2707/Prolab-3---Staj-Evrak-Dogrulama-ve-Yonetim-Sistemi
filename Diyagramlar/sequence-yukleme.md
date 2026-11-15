@@ -8,7 +8,7 @@
     participant FS as FileStorage
     participant ST as DocumentStatusService
     participant VS as ValidationService
-    participant Ext as DocxFieldExtractor
+    participant Ext as IDocumentFieldExtractor
     participant Rule as IValidationRule
     participant DB as AppDbContext
 

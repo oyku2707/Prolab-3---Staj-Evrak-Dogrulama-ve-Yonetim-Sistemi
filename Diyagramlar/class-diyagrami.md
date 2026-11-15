@@ -30,7 +30,7 @@ classDiagram
 
     class StudentProfile {
         +int Id
-        +int StudentId
+        +int? StudentId
         +string FullName
         +string TcNo
         +string StudentNo
@@ -203,11 +203,13 @@ classDiagram
     class DocxFieldExtractor
     class DocFieldExtractor
     class PdfFieldExtractor
+    class JpegFieldExtractor
     IDocumentFieldExtractor <|.. DocxFieldExtractor
     IDocumentFieldExtractor <|.. DocFieldExtractor
     IDocumentFieldExtractor <|.. PdfFieldExtractor
+    IDocumentFieldExtractor <|.. JpegFieldExtractor
     DocFieldExtractor --> DocxFieldExtractor : .docx'e çevirip okur
     IDocumentFieldExtractor ..> Ek16Data : üretir
 ```
 
-`Ek16Data` toplam 35 alan içerir (öğrenci, staj yapılan yer, işveren, onay bölümleri). Diyagramda temsili alanlar gösterilmiştir, tamamı `Domain/Entities/Ek16Data.cs` dosyasındadır. `DocFieldExtractor`, `.doc` dosyasını LibreOffice ile geçici bir `.docx`'e çevirip `DocxFieldExtractor`'a devreder. `FakeValidationService` geliştirme için yazılmış geçici sınıftır, `Program.cs` içinde kayıtlı değildir.
+`Ek16Data` toplam 35 alan içerir (öğrenci, staj yapılan yer, işveren, onay bölümleri). Diyagramda temsili alanlar gösterilmiştir, tamamı `Domain/Entities/Ek16Data.cs` dosyasındadır. `DocFieldExtractor`, `.doc` dosyasını LibreOffice ile geçici bir `.docx`'e çevirip `DocxFieldExtractor`'a devreder. `JpegFieldExtractor` şimdilik iskelettir: OCR yazılmadı, boş `Ek16Data` döndürür. `FakeValidationService` geliştirme için yazılmış geçici sınıftır, `Program.cs` içinde kayıtlı değildir.
