@@ -16,6 +16,7 @@ Sistem yalnızca Ek-16'yı işler. Google Form'a otomatik kayıt, Ek-17 üretimi
 | BCrypt.Net-Next | Şifre hash'leme |
 | JWT + cookie kimlik doğrulama | Oturum ve rol taşıma |
 | DocumentFormat.OpenXml | .docx okuma |
+| UglyToad.PdfPig | Metin tabanlı (taranmamış) .pdf okuma |
 | LibreOffice (isteğe bağlı) | .doc dosyasını .docx'e çevirmek için |
 | Bootstrap | Arayüz |
 
@@ -87,7 +88,12 @@ Test belgelerinde dikkat: sistem formdaki bilgiyi belgeyle karşılaştırır. F
 |---|---|
 | `ornek1.docx` (form belgeyle aynı doldurulursa) | Tamamlandı |
 | `ornek2_hatali.docx` | Hatalı / Eksik |
+| `ornek3_ahmet.docx` ve `ornek3_ahmet.pdf` (öğrenci numarası `220229001` ile kayıtlı hesap, form belgeyle aynı doldurulursa) | Tamamlandı |
 | `.txt`, `.exe` gibi uzantılar | Yükleme reddedilir, uyarı gösterilir |
+| `.jpg`, `.jpeg` | Yüklenir. JPEG okuyucusu şimdilik iskelettir, belgeden alan okumaz. Alanlar boş sayıldığı için belge Hatalı / Eksik olur (OCR final aşamasında) |
+| `.png` | Yüklenir ama otomatik okunamaz, Hatalı / Eksik olur (OCR final aşamasında) |
+
+Desteklenen biçimler: `.docx`, `.doc` (LibreOffice gerekir) ve metin tabanlı `.pdf`. PDF okuyucu yazıların sayfadaki konumuna göre çalıştığı için Ek-16 şablonunun düzenini bekler. Fotoğraftan veya taramadan üretilmiş PDF'ler okunamaz.
 
 ## Roller ve sayfalar
 
@@ -131,7 +137,7 @@ Geçişler `DocumentStatusService` içinde tek yerde denetlenir, geçersiz geçi
 | Form ve belge karşılaştırma | Formdaki bilgi ile belgeden okunan bilgi |
 | Veri seti karşılaştırma | Belgedeki bilgi ile veri setindeki resmi kayıt (uyarı düzeyinde, admin detayında ayrı gösterilir, öğrenci raporunda gizlidir) |
 
-Yükleme sırasında dosya biçimi (`.doc`, `.docx`, PDF, JPEG, PNG), boş dosya ve 10 MB sınırı kontrol edilir. `.docx` doğrudan, `.doc` LibreOffice ile çevrilerek okunur. PDF, JPEG ve PNG yüklenir ancak raporda "okunamıyor" hatası görünür.
+Yükleme sırasında dosya biçimi (`.doc`, `.docx`, PDF, JPEG, PNG), boş dosya ve 10 MB sınırı kontrol edilir. `.docx` doğrudan, `.doc` LibreOffice ile çevrilerek okunur. Metin tabanlı `.pdf` okunur. JPEG ve PNG yüklenir ama içerikleri okunamadığı için belge Hatalı / Eksik olur (JPEG okuyucusu iskelettir, PNG için okuyucu yoktur).
 
 ## Proje yapısı
 
@@ -173,7 +179,7 @@ StajSistemi/
 | [akis-belge.md](Diyagramlar/akis-belge.md) | Akış: yükleme ve doğrulama |
 | [akis-giris.md](Diyagramlar/akis-giris.md) | Akış: giriş ve kilitleme |
 | [akis-kayit.md](Diyagramlar/akis-kayit.md) | Akış: kayıt |
-| [akis-veri-seti.md](Diyagramlar/akis-veri-seti.md) | Akış: veri seti yükleme |
+| [akis-veriseti.md](Diyagramlar/akis-veriseti.md) | Akış: veri seti yükleme |
 | [akis-staj-gunu.md](Diyagramlar/akis-staj-gunu.md) | Akış: staj günü hesabı (final için tasarım) |
 
 GitHub bu dosyaları açınca diyagramları çizilmiş olarak gösterir.
@@ -182,7 +188,7 @@ GitHub bu dosyaları açınca diyagramları çizilmiş olarak gösterir.
 
 - Staj günü ekranı seçimi kaydeder, `CalculatedDays` hesaplanmaz ve gün sayısı kuralı yoktur (final).
 - Google Form URL yalnızca doğrulanır, kaydedilmez. Form'a otomatik kayıt ve Ek-17 üretimi finale kalmıştır, Ek-17 butonu pasiftir.
-- Otomatik okuma `.docx` için doğrudan, `.doc` için LibreOffice ile `.docx`'e çevrilerek çalışır (LibreOffice kurulu olmalı, yoksa raporda "belge okunamadı" görünür). PDF, JPEG ve PNG için OCR finalde eklenecektir.
+- Otomatik okuma `.docx` için doğrudan, `.doc` için LibreOffice ile `.docx`'e çevrilerek çalışır (LibreOffice kurulu olmalı, yoksa raporda "belge okunamadı" görünür). Metin tabanlı PDF okunur. Taranmış PDF, JPEG ve PNG için OCR finalde eklenecektir, `JpegFieldExtractor` şimdilik iskelettir ve boş veri döndürür.
 - Admin düzenlemesi doğrulamayı yeniden çalıştırmaz ve statüyü değiştirmez.
 - Doğrulama çökerse belge İnceleniyor'da takılmasın diye Hatalı/Eksik'e düşer, sebep rapora yazılmaz.
 - Çıkışta cookie silinir, JWT sunucuda ayrıca iptal edilmez.
