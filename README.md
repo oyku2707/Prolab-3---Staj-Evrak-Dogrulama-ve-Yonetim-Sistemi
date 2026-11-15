@@ -6,6 +6,10 @@ Programlama Laboratuvarı III, 2026-2027 Güz, Yazılım Mühendisliği.
 
 Sistem yalnızca Ek-16'yı işler. Google Form'a otomatik kayıt, Ek-17 üretimi ve OCR final aşamasına bırakılmıştır.
 
+## Rapor
+
+Vize raporu (IEEE biçiminde): [Vize_Raporu.pdf](Rapor/Vize_Raporu.pdf)
+
 ## Teknolojiler
 
 | Teknoloji | Kullanım |
@@ -143,6 +147,7 @@ Yükleme sırasında dosya biçimi (`.doc`, `.docx`, PDF, JPEG, PNG), boş dosya
 
 ```
 Diyagramlar/          Mermaid diyagram dosyaları
+Rapor/                Vize raporu (PDF)
 StajSistemi/
   Controllers/        Ekran mantığı (Auth, Student, Documents, Admin, Dataset, Home)
   Views/              Razor ekranları
@@ -198,10 +203,10 @@ GitHub bu dosyaları açınca diyagramları çizilmiş olarak gösterir.
 - Cookie `Secure` bayrağı canlı ortam için ayrıca düşünülmelidir.
 - `MySqlConnector` paketi için `NU1902` uyarısı çıkar. Pomelo ve EF Core 9.0.0'a sabit olduğundan paket yükseltilmedi.
 
-## Ekip
+## Geliştiriciler
 
-| Hat | Sorumluluk |
-|---|---|
-| Kişi 1 | Kimlik, güvenlik, veri seti: giriş, şifre hash'leme, kilit, roller, kayıt, veri seti yükleme |
-| Kişi 2 | Doğrulama motoru: kurallar, .docx okuma, karşılaştırmalar, ortak veri modeli |
-| Kişi 3 | Arayüz, evrak yükleme, statü akışı, rapor ekranı, admin sayfaları |
+| Ad Soyad | Hat | Sorumluluk |
+|---|---|---|
+| Sena Aygün | Kişi 1 | Kimlik, güvenlik, veri seti: giriş, şifre hash'leme, kilit, roller, kayıt, veri seti yükleme |
+| Öykü Ertuna | Kişi 2 | Doğrulama motoru: kurallar, .docx ve PDF okuma, karşılaştırmalar, ortak veri modeli |
+| Fatih Mutlu | Kişi 3 | Arayüz, evrak yükleme, statü akışı, rapor ekranı, admin sayfaları |
