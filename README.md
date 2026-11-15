@@ -8,7 +8,7 @@ Sistem yalnızca Ek-16'yı işler. Google Form'a otomatik kayıt, Ek-17 üretimi
 
 ## Rapor
 
-Vize raporu (IEEE biçiminde): [Vize_Raporu.pdf](Rapor/Vize_Raporu.pdf)
+Vize raporu (IEEE biçiminde): [rapor.pdf](Rapor/rapor.pdf)
 
 ## Teknolojiler
 
