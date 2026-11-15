@@ -16,6 +16,7 @@ Sistem yalnızca Ek-16'yı işler. Google Form'a otomatik kayıt, Ek-17 üretimi
 | BCrypt.Net-Next | Şifre hash'leme |
 | JWT + cookie kimlik doğrulama | Oturum ve rol taşıma |
 | DocumentFormat.OpenXml | .docx okuma |
+| UglyToad.PdfPig | Metin tabanlı (taranmamış) .pdf okuma |
 | LibreOffice (isteğe bağlı) | .doc dosyasını .docx'e çevirmek için |
 | Bootstrap | Arayüz |
 
@@ -87,7 +88,11 @@ Test belgelerinde dikkat: sistem formdaki bilgiyi belgeyle karşılaştırır. F
 |---|---|
 | `ornek1.docx` (form belgeyle aynı doldurulursa) | Tamamlandı |
 | `ornek2_hatali.docx` | Hatalı / Eksik |
+| `ornek3_ahmet.docx` ve `ornek3_ahmet.pdf` (öğrenci numarası `220229001` ile kayıtlı hesap, form belgeyle aynı doldurulursa) | Tamamlandı |
 | `.txt`, `.exe` gibi uzantılar | Yükleme reddedilir, uyarı gösterilir |
+| `.png`, `.jpg` | Yüklenir ama otomatik okunamaz, Hatalı / Eksik olur (OCR final aşamasında) |
+
+Desteklenen biçimler: `.docx`, `.doc` (LibreOffice gerekir) ve metin tabanlı `.pdf`. PDF okuyucu yazıların sayfadaki konumuna göre çalıştığı için Ek-16 şablonunun düzenini bekler. Fotoğraftan veya taramadan üretilmiş PDF'ler okunamaz.
 
 ## Roller ve sayfalar
 
