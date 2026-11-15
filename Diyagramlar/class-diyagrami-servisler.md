@@ -6,7 +6,7 @@ Alan modeli ve doğrulama sınıfları için `class-diyagrami.md` dosyasına bak
 classDiagram
     class ICurrentUserService {
         <<interface>>
-        +int UserId
+        +int? UserId
         +bool IsAdmin
     }
     class ClaimsCurrentUserService
@@ -85,7 +85,7 @@ classDiagram
     }
     class BcryptPasswordHasher
     class JwtService {
-        +GenerateToken(userId, name, role, fullName) TokenResponseDto
+        +GenerateToken(userId, email, role, fullName) TokenResponseDto
     }
     IAuthService <|.. AuthService
     IPasswordHasher <|.. BcryptPasswordHasher

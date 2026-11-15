@@ -202,8 +202,10 @@ classDiagram
     }
     class DocxFieldExtractor
     class DocFieldExtractor
+    class PdfFieldExtractor
     IDocumentFieldExtractor <|.. DocxFieldExtractor
     IDocumentFieldExtractor <|.. DocFieldExtractor
+    IDocumentFieldExtractor <|.. PdfFieldExtractor
     DocFieldExtractor --> DocxFieldExtractor : .docx'e çevirip okur
     IDocumentFieldExtractor ..> Ek16Data : üretir
 ```
