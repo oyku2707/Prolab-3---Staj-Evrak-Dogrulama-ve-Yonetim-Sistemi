@@ -4,6 +4,7 @@ using StajSistemi.Data;
 using StajSistemi.Domain.Entities;
 using StajSistemi.Domain.Enums;
 using StajSistemi.DTOs;
+using StajSistemi.Helpers;
 
 namespace StajSistemi.Services.Dataset
 {
@@ -63,13 +64,23 @@ namespace StajSistemi.Services.Dataset
                 if (!int.TryParse(f[11], out int healthAid) || healthAid < 1 || healthAid > 6)
                 { Reject(result, row, $"Sağlık yardımı statüsü 1-6 olmalı: '{f[11]}'."); continue; }
 
+                // Veri seti resmi referans kayıt: geçersiz kimlik numarası olan satır reddedilir
+                var rowNationality = ParseNationality(nationalityText);
+                var tcError = TcKimlikChecker.Validate(tcNo.Trim(), rowNationality);
+                if (tcError != null)
+                { Reject(result, row, $"Kimlik numarası geçersiz ({tcNo}): {tcError}"); continue; }
+
+                // Telefon +90 xxx xxx xx xx biçimine çevrilir; çevrilemiyorsa satır reddedilir
+                if (!PhoneNormalizer.TryNormalize(phone, out string normalizedPhone))
+                { Reject(result, row, $"Telefon numarası geçersiz: '{phone}' (10 haneli numara bekleniyor)."); continue; }
+
                 if (!seenStudentNos.Add(studentNo))
                 { Reject(result, row, $"Öğrenci numarası dosyada tekrar ediyor: {studentNo}."); continue; }
 
                 if (!string.IsNullOrWhiteSpace(email) && !seenEmails.Add(email))
                 { Reject(result, row, $"E-posta dosyada tekrar ediyor: {email}."); continue; }
 
-                var nationality = ParseNationality(nationalityText);
+                var nationality = rowNationality;
 
                 // Aynı öğrenci no varsa güncelle (StudentId'ye dokunma), yoksa oluştur
                 var profile = await _context.StudentProfiles.FirstOrDefaultAsync(p => p.StudentNo == studentNo);
@@ -78,7 +89,7 @@ namespace StajSistemi.Services.Dataset
                     profile = new StudentProfile { StudentNo = studentNo }; // StudentId boş kalır
 
                 profile!.FullName = fullName;
-                profile.TcNo = tcNo; // metin olarak saklanır, baştaki sıfır kaybolmaz
+                profile.TcNo = tcNo.Trim(); // metin olarak saklanır, baştaki sıfır kaybolmaz
                 profile.Nationality = nationality;
                 profile.BirthDate = birthDate;
                 profile.Address = address;
@@ -86,7 +97,7 @@ namespace StajSistemi.Services.Dataset
                 profile.PreviousInternshipDays = prevDays;
                 profile.SubmissionYear = submissionYear;
                 profile.Email = email;
-                profile.Phone = phone;
+                profile.Phone = normalizedPhone;
                 profile.HealthAidStatus = healthAid;
 
                 if (isNew)
