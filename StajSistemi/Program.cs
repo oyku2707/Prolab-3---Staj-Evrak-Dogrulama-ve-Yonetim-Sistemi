@@ -7,6 +7,7 @@ using StajSistemi.Domain.Interfaces;
 using StajSistemi.Validation.Rules;
 using StajSistemi.Services.Extractors;
 using StajSistemi.Services.Documents;
+using StajSistemi.Services.Holidays;
 
 
 
@@ -22,6 +23,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<IDatasetReader, CsvDatasetReader>();
 builder.Services.AddScoped<DatasetImportService>();
+builder.Services.AddScoped<IHolidayProvider, HolidayProvider>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -39,19 +41,19 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 
- });
-    // Doğrulama kuralları
-    builder.Services.AddScoped<IValidationRule, TcKimlikRule>();
-    builder.Services.AddScoped<IValidationRule, PhoneRule>();
-    builder.Services.AddScoped<IValidationRule, EmailRule>();
-    builder.Services.AddScoped<IValidationRule, EngineerCountRule>();
-    builder.Services.AddScoped<IValidationRule, FormVsDocumentRule>();
-    builder.Services.AddScoped<IValidationRule, ProfileMatchRule>();
-    builder.Services.AddScoped<IDocumentFieldExtractor, DocFieldExtractor>();
-    builder.Services.AddScoped<IDocumentFieldExtractor, DocxFieldExtractor>();
-    builder.Services.AddScoped<IDocumentFieldExtractor, JpegFieldExtractor>();
-    builder.Services.AddScoped<IDocumentFieldExtractor, PdfFieldExtractor>();
-    builder.Services.AddScoped<IValidationService, ValidationService>();
+});
+// Doğrulama kuralları
+builder.Services.AddScoped<IValidationRule, TcKimlikRule>();
+builder.Services.AddScoped<IValidationRule, PhoneRule>();
+builder.Services.AddScoped<IValidationRule, EmailRule>();
+builder.Services.AddScoped<IValidationRule, EngineerCountRule>();
+builder.Services.AddScoped<IValidationRule, FormVsDocumentRule>();
+builder.Services.AddScoped<IValidationRule, ProfileMatchRule>();
+builder.Services.AddScoped<IDocumentFieldExtractor, DocFieldExtractor>();
+builder.Services.AddScoped<IDocumentFieldExtractor, DocxFieldExtractor>();
+builder.Services.AddScoped<IDocumentFieldExtractor, JpegFieldExtractor>();
+builder.Services.AddScoped<IDocumentFieldExtractor, PdfFieldExtractor>();
+builder.Services.AddScoped<IValidationService, ValidationService>();
 
 
 builder.Services.AddHttpContextAccessor();
@@ -63,6 +65,7 @@ builder.Services.AddScoped<IAdminDocumentService, AdminDocumentService>();
 var app = builder.Build();
 
 await DbSeeder.SeedAdminAsync(app.Services);
+await DbSeeder.SeedHolidaysAsync(app.Services);
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
