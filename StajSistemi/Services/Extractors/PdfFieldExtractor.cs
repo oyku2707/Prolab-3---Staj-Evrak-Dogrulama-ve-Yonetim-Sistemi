@@ -147,7 +147,65 @@ public sealed class PdfFieldExtractor : IDocumentFieldExtractor
             string.IsNullOrWhiteSpace(data.StudentNo))
             throw new InvalidDataException("PDF okunabildi ancak doldurulmuş Ek-16 öğrenci alanları bulunamadı.");
 
+        ReadSignaturesAndApprovals(page, words, yEmployer.Value, yEnd, data);
+
         return data;
+    }
+
+    private static readonly string[] ApprovalLabels = { "ADI", "SOYADI", "TARIH", "IMZA" };
+
+    // İşveren imza/kaşe ve öğrenci/danışman onay bayraklarını doldurur.
+    // Hata olursa bayraklar false kalır; asıl alanların okunması bozulmaz.
+    private static void ReadSignaturesAndApprovals(
+        UglyToad.PdfPig.Content.Page page, List<Word> words, double yEmployer, double yEnd, Ek16Data data)
+    {
+        if (yEnd == double.MaxValue) return;   // "ÖĞRENCİNİN ONAYI" satırı bulunamadıysa bölgeler belirsiz
+
+        try
+        {
+            // Her görselin orta noktası; Y, sayfanın üstünden aşağı doğru ölçülür (kelimelerin Top değeriyle aynı yön).
+            var images = page.GetImages()
+                .Select(i => (MidX: (i.Bounds.Left + i.Bounds.Right) / 2,
+                              MidY: page.Height - (i.Bounds.Top + i.Bounds.Bottom) / 2))
+                .ToList();
+
+            // İşveren bölümüne düşen herhangi bir görsel imza ve kaşe sayılır 
+            var hasEmployerImage = images.Any(i => i.MidY >= yEmployer && i.MidY < yEnd);
+            data.EmployerHasSignature = hasEmployerImage;
+            data.EmployerHasStamp = hasEmployerImage;
+
+            // "ÖĞRENCİNİN ONAYI" başlık satırının altı: sol yarı öğrenci, sağ yarı danışman.
+            var splitX = page.Width / 2;
+            var below = words.Where(w => w.Top > yEnd + RowTol).ToList();
+
+            data.StudentApprovalFilled =
+                images.Any(i => i.MidY > yEnd && i.MidX < splitX) ||
+                HasLeftoverText(below.Where(w => w.X < splitX), cutAfter: "ARZEDERIM");
+
+            data.AdvisorApprovalFilled =
+                images.Any(i => i.MidY > yEnd && i.MidX >= splitX) ||
+                HasLeftoverText(below.Where(w => w.X >= splitX), cutAfter: null);
+        }
+        catch (Exception)
+        {
+           
+        }
+    }
+
+    // Standart metin ("... arz ederim") ve Adı/Soyadı/Tarih/İmza etiketleri çıkarıldıktan sonra yazı kalıyor mu?
+    private static bool HasLeftoverText(IEnumerable<Word> words, string? cutAfter)
+    {
+        var kept = ToRows(words.Where(w => !ApprovalLabels.Contains(Normalize(w.Text))))
+            .SelectMany(r => r.Words);
+        var text = Normalize(string.Concat(kept.Select(w => w.Text)));
+
+        if (cutAfter != null)
+        {
+            var i = text.IndexOf(cutAfter, StringComparison.Ordinal);
+            if (i < 0) return false;   
+            text = text[(i + cutAfter.Length)..];
+        }
+        return text.Length > 0;
     }
 
     private static List<Row> ToRows(IEnumerable<Word> words)
