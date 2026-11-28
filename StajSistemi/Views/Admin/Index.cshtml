@@ -1,0 +1,93 @@
+@using StajSistemi.Helpers
+@model StajSistemi.Models.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Özet";
+    var maxDay = Math.Max(1, Model.Last7Days.Max(d => d.Count));
+}
+
+<h2 class="mb-3">Özet</h2>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Toplam belge</div>
+                <div class="fs-2 fw-bold">@Model.TotalDocuments</div>
+                <a asp-action="Documents" class="small">Tümünü listele</a>
+            </div>
+        </div>
+    </div>
+    @foreach (var s in Model.ByStatus)
+    {
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-muted small">
+                        <span class="badge @StatusDisplay.BadgeClass(s.Status)">@StatusDisplay.Label(s.Status)</span>
+                    </div>
+                    <div class="fs-2 fw-bold">@s.Count</div>
+                    <a asp-action="Documents" asp-route-status="@s.Status" class="small">Listele</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">Son 7 günde yüklenen belgeler</div>
+            <div class="card-body">
+                @foreach (var d in Model.Last7Days)
+                {
+                    <div class="d-flex align-items-center mb-1">
+                        <div style="width:90px" class="small">@d.Day.ToString("dd.MM ddd")</div>
+                        <div class="progress flex-grow-1" style="height:14px">
+                            <div class="progress-bar" role="progressbar" style="width:@(d.Count * 100 / maxDay)%"></div>
+                        </div>
+                        <div style="width:30px" class="text-end small">@d.Count</div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">En sık başarısız olan kurallar</div>
+            <div class="card-body">
+                @if (!Model.TopFailedRules.Any())
+                {
+                    <div class="text-muted">Henüz başarısız kontrol yok.</div>
+                }
+                else
+                {
+                    <table class="table table-sm mb-0">
+                        <thead><tr><th>Kural</th><th class="text-end">Başarısız sonuç</th><th></th></tr></thead>
+                        <tbody>
+                            @foreach (var r in Model.TopFailedRules)
+                            {
+                                <tr>
+                                    <td>@r.RuleName</td>
+                                    <td class="text-end">@r.FailedCount</td>
+                                    <td class="text-end"><a asp-action="Documents" asp-route-rule="@r.RuleName" class="small">Belgeleri gör</a></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">Veri seti durumu</div>
+            <div class="card-body">
+                Veri setinde <strong>@Model.ProfileCount</strong> öğrenci kaydı var,
+                bunlardan <strong>@Model.LinkedProfileCount</strong> tanesi kayıtlı bir hesaba bağlı.
+                <a href="/Dataset/Upload" class="ms-2">Veri seti yükle</a>
+            </div>
+        </div>
+    </div>
+</div>

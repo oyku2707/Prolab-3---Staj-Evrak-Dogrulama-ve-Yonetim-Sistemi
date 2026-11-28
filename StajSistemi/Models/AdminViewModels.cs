@@ -18,6 +18,8 @@ public class AdminListViewModel
     public List<AdminDocumentRow> Rows { get; set; } = new();
     public DocumentStatus? Status { get; set; }
     public string? Q { get; set; }
+    public string? Rule { get; set; }
+    public List<string> RuleOptions { get; set; } = new();
     public DateTime? DateFrom { get; set; }
     public DateTime? DateTo { get; set; }
     public int Page { get; set; } = 1;
@@ -46,4 +48,32 @@ public class AdminDetailsViewModel
     public List<ValidationResultRecord> Warnings { get; set; } = new();
     public List<ValidationResultRecord> Passed { get; set; } = new();
     public List<ValidationResultRecord> DatasetResults { get; set; } = new();
+}
+
+public class StatusCount
+{
+    public DocumentStatus Status { get; set; }
+    public int Count { get; set; }
+}
+
+public class RuleCount
+{
+    public string RuleName { get; set; } = "";
+    public int FailedCount { get; set; }
+}
+
+public class DayCount
+{
+    public DateTime Day { get; set; }
+    public int Count { get; set; }
+}
+
+public class AdminDashboardViewModel
+{
+    public int TotalDocuments { get; set; }
+    public List<StatusCount> ByStatus { get; set; } = new();
+    public List<RuleCount> TopFailedRules { get; set; } = new();
+    public List<DayCount> Last7Days { get; set; } = new();
+    public int ProfileCount { get; set; }
+    public int LinkedProfileCount { get; set; }
 }

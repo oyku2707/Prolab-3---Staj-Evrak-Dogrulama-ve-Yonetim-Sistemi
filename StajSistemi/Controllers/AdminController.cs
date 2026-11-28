@@ -35,19 +35,63 @@ public class AdminController : Controller
         base.OnActionExecuting(context);
     }
 
-    public IActionResult Index() => RedirectToAction("Documents");
+    // Özet sayfası: sayılar, son 7 gün, en sık başarısız kurallar, veri seti durumu.
+    public async Task<IActionResult> Index()
+    {
+        var counts = await _db.Documents
+            .GroupBy(d => d.Status)
+            .Select(g => new { Status = g.Key, Count = g.Count() })
+            .ToListAsync();
+        var countMap = counts.ToDictionary(x => x.Status, x => x.Count);
+
+        var byStatus = Enum.GetValues<DocumentStatus>()
+            .Select(s => new StatusCount { Status = s, Count = countMap.GetValueOrDefault(s) })
+            .ToList();
+
+        var topRules = await _db.ValidationResults
+            .Where(r => !r.IsValid)
+            .GroupBy(r => r.RuleName)
+            .Select(g => new RuleCount { RuleName = g.Key, FailedCount = g.Count() })
+            .OrderByDescending(x => x.FailedCount)
+            .Take(5)
+            .ToListAsync();
+
+        var since = DateTime.Today.AddDays(-6);
+        var perDay = await _db.Documents
+            .Where(d => d.UploadedAt >= since)
+            .GroupBy(d => d.UploadedAt.Date)
+            .Select(g => new { Day = g.Key, Count = g.Count() })
+            .ToListAsync();
+        var dayMap = perDay.ToDictionary(x => x.Day.Date, x => x.Count);
+
+        var last7 = Enumerable.Range(0, 7)
+            .Select(i => since.AddDays(i))
+            .Select(day => new DayCount { Day = day, Count = dayMap.GetValueOrDefault(day.Date) })
+            .ToList();
+
+        var model = new AdminDashboardViewModel
+        {
+            TotalDocuments = byStatus.Sum(x => x.Count),
+            ByStatus = byStatus,
+            TopFailedRules = topRules,
+            Last7Days = last7,
+            ProfileCount = await _db.StudentProfiles.CountAsync(),
+            LinkedProfileCount = await _db.StudentProfiles.CountAsync(p => p.StudentId != null)
+        };
+        return View(model);
+    }
 
     public async Task<IActionResult> Documents(
-        DocumentStatus? status, string? q, DateTime? dateFrom, DateTime? dateTo, int page = 1)
+        DocumentStatus? status, string? q, string? rule, DateTime? dateFrom, DateTime? dateTo, int page = 1)
     {
-        var model = await BuildListAsync(status, q, dateFrom, dateTo, page, false);
+        var model = await BuildListAsync(status, q, rule, dateFrom, dateTo, page, false);
         return View(model);
     }
 
     public async Task<IActionResult> Completed(
         string? q, DateTime? dateFrom, DateTime? dateTo, int page = 1)
     {
-        var model = await BuildListAsync(DocumentStatus.Tamamlandi, q, dateFrom, dateTo, page, true);
+        var model = await BuildListAsync(DocumentStatus.Tamamlandi, q, null, dateFrom, dateTo, page, true);
         return View("Documents", model);
     }
 
@@ -155,7 +199,8 @@ public class AdminController : Controller
     }
 
     private async Task<AdminListViewModel> BuildListAsync(
-        DocumentStatus? status, string? q, DateTime? dateFrom, DateTime? dateTo, int page, bool onlyCompleted)
+        DocumentStatus? status, string? q, string? rule,
+        DateTime? dateFrom, DateTime? dateTo, int page, bool onlyCompleted)
     {
         var query = _db.Documents.AsQueryable();
 
@@ -169,6 +214,10 @@ public class AdminController : Controller
                 d.EnteredData!.StudentNo!.Contains(term) ||
                 d.EnteredData.StudentFullName!.Contains(term));
         }
+
+        // Hata türü: seçilen kuraldan başarısız sonucu olan belgeler.
+        if (!string.IsNullOrWhiteSpace(rule))
+            query = query.Where(d => d.Results.Any(r => !r.IsValid && r.RuleName == rule));
 
         if (dateFrom != null)
         {
@@ -200,11 +249,20 @@ public class AdminController : Controller
             })
             .ToListAsync();
 
+        var ruleOptions = await _db.ValidationResults
+            .Where(r => !r.IsValid)
+            .Select(r => r.RuleName)
+            .Distinct()
+            .OrderBy(n => n)
+            .ToListAsync();
+
         return new AdminListViewModel
         {
             Rows = rows,
             Status = status,
             Q = q,
+            Rule = rule,
+            RuleOptions = ruleOptions,
             DateFrom = dateFrom,
             DateTo = dateTo,
             Page = page,

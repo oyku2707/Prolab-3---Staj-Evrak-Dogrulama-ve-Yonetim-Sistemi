@@ -31,8 +31,17 @@
                 }
             </select>
         </div>
+        <div class="col-md-2">
+            <select name="rule" class="form-select">
+                <option value="">Tüm hata türleri</option>
+                @foreach (var r in Model.RuleOptions)
+                {
+                    <option value="@r" selected="@(Model.Rule == r)">@r</option>
+                }
+            </select>
+        </div>
     }
-    <div class="col-md-3">
+    <div class="col-md-2">
         <input name="q" value="@Model.Q" class="form-control" placeholder="Öğrenci no veya ad" />
     </div>
     <div class="col-md-2">
@@ -41,7 +50,7 @@
     <div class="col-md-2">
         <input type="date" name="dateTo" value="@Model.DateTo?.ToString("yyyy-MM-dd")" class="form-control" />
     </div>
-    <div class="col-md-3">
+    <div class="col-md-2">
         <button class="btn btn-primary" type="submit">Filtrele</button>
         <a class="btn btn-outline-secondary" asp-action="@pageAction">Temizle</a>
     </div>
@@ -87,7 +96,7 @@ else
                 {
                     <li class="page-item @(i == Model.Page ? "active" : "")">
                         <a class="page-link" asp-action="@pageAction" asp-route-page="@i"
-                           asp-route-status="@Model.Status" asp-route-q="@Model.Q"
+                           asp-route-status="@Model.Status" asp-route-q="@Model.Q" asp-route-rule="@Model.Rule"
                            asp-route-dateFrom="@Model.DateFrom?.ToString("yyyy-MM-dd")"
                            asp-route-dateTo="@Model.DateTo?.ToString("yyyy-MM-dd")">@i</a>
                     </li>

@@ -18,7 +18,7 @@ public class HomeController : Controller
             return Redirect("/Auth/Login");
 
         return _currentUser.IsAdmin
-            ? RedirectToAction("Documents", "Admin")
+            ? RedirectToAction("Index", "Admin")
             : RedirectToAction("Index", "Student");
     }
 }
