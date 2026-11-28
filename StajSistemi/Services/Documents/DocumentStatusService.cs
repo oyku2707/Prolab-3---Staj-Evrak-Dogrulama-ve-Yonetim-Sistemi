@@ -30,4 +30,8 @@ public class DocumentStatusService : IDocumentStatusService
     // Tamamlandı kilidi: öğrenci için sunucu tarafında kontrol edilir.
     public bool CanStudentModify(Document document)
         => document.Status != DocumentStatus.Tamamlandi;
+
+    // Admin istisnası: geçiş tablosunu atlar. Sadece AdminDocumentService çağırır.
+    public void AdminSet(Document document, DocumentStatus to)
+        => document.Status = to;
 }

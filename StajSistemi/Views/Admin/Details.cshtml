@@ -10,6 +10,10 @@
 {
     <div class="alert alert-success">@TempData["Message"]</div>
 }
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
 
 <div class="card mb-3">
     <div class="card-body row">
@@ -100,9 +104,14 @@
     </details>
 }
 
-<a class="btn btn-outline-secondary" asp-action="Documents">Listeye dön</a>
-<a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model.DocumentId">Düzenle</a>
-<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Sil</button>
+<div class="d-flex flex-wrap gap-2 align-items-center">
+    <a class="btn btn-outline-secondary" asp-action="Documents">Listeye dön</a>
+    <a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model.DocumentId">Düzenle</a>
+    <form asp-action="Revalidate" asp-route-id="@Model.DocumentId" method="post" class="d-inline">
+        <button type="submit" class="btn btn-primary">Yeniden doğrula</button>
+    </form>
+    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Sil</button>
+</div>
 
 <div class="modal fade" id="deleteModal" tabindex="-1">
     <div class="modal-dialog">

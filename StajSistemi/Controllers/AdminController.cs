@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
@@ -6,7 +7,6 @@ using StajSistemi.Domain.Enums;
 using StajSistemi.Models;
 using StajSistemi.Services;
 using StajSistemi.Services.Documents;
-using Microsoft.AspNetCore.Authorization;
 
 namespace StajSistemi.Controllers;
 
@@ -27,7 +27,7 @@ public class AdminController : Controller
         _adminDocs = adminDocs;
     }
 
-    // Tek yerde rol kontrolü. Giriş gelince yerine [Authorize(Roles = "ROLE_ADMIN")] konacak.
+    // [Authorize]'a ek ikinci kontrol: rol yoksa 403.
     public override void OnActionExecuting(ActionExecutingContext context)
     {
         if (!_currentUser.IsAdmin)
@@ -128,7 +128,20 @@ public class AdminController : Controller
             return View(model);
         }
 
-        TempData["Message"] = "Belge güncellendi.";
+        TempData["Message"] = "Belge güncellendi. Sonuçları yenilemek için Yeniden doğrula'ya basın.";
+        return RedirectToAction("Details", new { id });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Revalidate(int id)
+    {
+        var result = await _adminDocs.RevalidateAsync(id);
+        if (result.Success)
+            TempData["Message"] = "Belge yeniden doğrulandı, sonuçlar ve statü güncellendi.";
+        else
+            TempData["Error"] = result.Error;
+
         return RedirectToAction("Details", new { id });
     }
 

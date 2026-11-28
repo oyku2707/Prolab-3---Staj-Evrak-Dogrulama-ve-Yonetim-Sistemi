@@ -8,4 +8,5 @@ public interface IDocumentStatusService
     bool CanTransition(DocumentStatus from, DocumentStatus to);
     void Transition(Document document, DocumentStatus to);
     bool CanStudentModify(Document document);
+    void AdminSet(Document document, DocumentStatus to);
 }
