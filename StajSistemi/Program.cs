@@ -45,6 +45,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     builder.Services.AddScoped<IValidationRule, ProfileMatchRule>();
     builder.Services.AddScoped<IValidationRule, AcademicYearRule>();
     builder.Services.AddScoped<IValidationRule, SubmissionDateRule>();
+    builder.Services.AddScoped<IValidationRule, AddressRule>();
     builder.Services.AddScoped<IDocumentFieldExtractor, DocFieldExtractor>();
     builder.Services.AddScoped<IDocumentFieldExtractor, DocxFieldExtractor>();
     builder.Services.AddScoped<IDocumentFieldExtractor, JpegFieldExtractor>();
